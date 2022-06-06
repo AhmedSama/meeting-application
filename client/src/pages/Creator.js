@@ -8,7 +8,7 @@ import {BsCameraVideoFill, BsCameraVideoOffFill, BsMicFill} from 'react-icons/bs
 
 
 export const Creator = () => {
-  const {socket} = useContext(context)
+  const {socket,users} = useContext(context)
   const videoRef = useRef()
   const streamRef = useRef(null)
   const navigate = useNavigate()
@@ -26,7 +26,7 @@ export const Creator = () => {
     })
   },[])
   useEffect(()=>{
-    socket.on("recv",data=>{
+    socket.on("recv-peerID",data=>{
       console.log(data)
       peerIDsRef.current.push(data.peerID)
       // call
@@ -96,7 +96,9 @@ export const Creator = () => {
   return (
     <div className='meet-container'>
       <div className='left'>
-        {/* we have two windows one for users in the meet and other for the chat */}
+        {users.map(user=>{
+          return <li key={user.id}>{user.name}</li>
+        })}
       </div>
       <div className='right'>
         <div className='section-top'>
@@ -121,6 +123,7 @@ export const Creator = () => {
           </div>
         </div>
       </div>
+
     </div>
   )
 }

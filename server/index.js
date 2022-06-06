@@ -27,7 +27,8 @@ io.on('connection', (socket) => {
   socket.on("join",data=>{
     if(io.of("/").adapter.rooms.has(data.roomID)){
         const roomID = data.roomID
-        socket.username = data.name
+        socket.name = data.name
+        socket.roomID = data.roomID
         socket.join(roomID)
         socket.emit("joiner",{ok:true,roomID:roomID,...data})
         socket.to(roomID).emit("join-room",{ok:true,...data})
@@ -36,12 +37,17 @@ io.on('connection', (socket) => {
         socket.emit("joiner",{ok:false,msg:"roomID is not existed, please check your room ID or create new meet"})
     }  
   })
-  socket.on("send",data=>{
+  socket.on("send-peerID",data=>{
     console.log(data)
-    socket.to(data.roomID).emit("recv",data)
+    socket.to(data.roomID).emit("recv-peerID",data)
+  })
+  socket.on("join-room",data=>{
+    socket.to(data.roomID).emit("join-room")
   })
   socket.on("disconnect",()=>{
       console.log(socket.id + " disconnected")
+      socket.to(socket.roomID).emit("leave-room",{name:socket.name})
+      socket.leave(socket.roomID)
   })
 });
 

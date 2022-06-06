@@ -6,7 +6,7 @@ import {BsCameraVideoFill, BsMicFill} from 'react-icons/bs'
 
 export const Joiner = () => {
   const navigate = useNavigate()
-  const {socket,roomID} = useContext(context)
+  const {socket,roomID,users} = useContext(context)
   const peerRef = useRef(new Peer)
   const peerIDRef = useRef(null)
   const videoRef = useRef()
@@ -21,7 +21,7 @@ export const Joiner = () => {
         peerID : peerID
       }
       console.log(data)
-      socket.emit("send",data)
+      socket.emit("send-peerID",data)
     })
   },[])
   useEffect(()=>{

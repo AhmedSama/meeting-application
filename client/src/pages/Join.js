@@ -21,6 +21,11 @@ export const Join = () => {
         if(data.ok){
           // localStorage.setItem("roomID",data.roomID)
           setRoomID(data.roomID)
+          
+          socket.emit("join-room",{
+            roomID : data.roomID,
+            name : data.name
+          })
           navigate(`/join/${data.roomID}`)
         }
         else{
