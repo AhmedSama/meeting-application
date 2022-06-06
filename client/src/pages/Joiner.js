@@ -2,6 +2,7 @@ import {Peer} from 'peerjs'
 import React, { useContext, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { context } from '../App'
+import {BsCameraVideoFill, BsMicFill} from 'react-icons/bs'
 
 export const Joiner = () => {
   const navigate = useNavigate()
@@ -39,11 +40,25 @@ export const Joiner = () => {
     });
   },[])
   return (
-    <div>
-      <div className='left'></div>
+    <div className='meet-container'>
+      <div className='left'>
+        {/* we have two windows one for users in the meet and other for the chat */}
+      </div>
       <div className='right'>
-        <div className='video-container'>
-          <video autoPlay ref={videoRef}></video>
+        <div className='section-top'>
+          <div className='video-container'>
+            <video autoPlay ref={videoRef} muted></video>
+          </div>
+        </div>
+        <div className='section-bottom'>
+          <div className='actions'>
+            <div className='action-icon-container'>
+              <BsMicFill className='action-icon' />
+            </div>
+            <div className='action-icon-container'>
+              <BsCameraVideoFill className='action-icon' />
+            </div>
+          </div>
         </div>
       </div>
     </div>

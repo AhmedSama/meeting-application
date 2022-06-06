@@ -1,7 +1,10 @@
-import React, { useContext, useEffect, useRef } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { context } from '../App'
 import { Peer } from "peerjs"
+import {FiShare} from 'react-icons/fi'
+import {BsCameraVideoFill, BsCameraVideoOffFill, BsMicFill} from 'react-icons/bs'
+
 
 
 export const Creator = () => {
@@ -14,6 +17,7 @@ export const Creator = () => {
   const peerIDRef = useRef(null)
   const peerConnectionsRef = useRef([])
   const peerIDsRef = useRef([])
+  const [videoIcon,setVideoIcon] = useState(true)
   useEffect(()=>{
     if(!roomID)
       navigate("/")
@@ -29,7 +33,10 @@ export const Creator = () => {
       call(data.peerID)
     })
   },[])
-
+  const stopStream = () => {
+    streamRef.current.getVideoTracks()[0]?.stop()
+    streamRef.current.getAudioTracks()[0]?.stop()
+  }
   const call = (peerID) => {
     const c = peerRef.current.call(peerID,streamRef.current)
     peerConnectionsRef.current.push(c.peerConnection)
@@ -42,7 +49,7 @@ export const Creator = () => {
   const captureNewStream = async() =>{
     try {
       streamRef.current = await navigator.mediaDevices.getDisplayMedia({
-        video: true,
+        video: { frameRate: { ideal: 100, max: 200 } },
         audio: true
       });
       videoRef.current.srcObject = streamRef.current
@@ -59,6 +66,7 @@ export const Creator = () => {
         audio: true
       })
       videoRef.current.srcObject = newStream
+      stopStream()
       streamRef.current = newStream
       const tracks = newStream.getVideoTracks()[0]
       tracks.enabled = true;
@@ -81,14 +89,37 @@ export const Creator = () => {
     }
 
   }
+  const stopVideo = () => {
+    streamRef.current.getVideoTracks()[0].enabled = streamRef.current.getVideoTracks()[0].enabled ? false : true
+    setVideoIcon(streamRef.current.getVideoTracks()[0].enabled)
+  }
   return (
-    <div>
-      <div className='left'></div>
+    <div className='meet-container'>
+      <div className='left'>
+        {/* we have two windows one for users in the meet and other for the chat */}
+      </div>
       <div className='right'>
-        <div className='video-container'>
-          <video autoPlay ref={videoRef} muted></video>
+        <div className='section-top'>
+          <div className='video-container'>
+            <video autoPlay ref={videoRef} muted></video>
+          </div>
         </div>
-        <button onClick={share} className='btn'>share</button>
+        <div className='section-bottom'>
+          <div className='actions'>
+            <div className='action-icon-container'>
+              <BsMicFill className='action-icon' />
+            </div>
+            <div onClick={share} className='action-icon-container'>
+              <FiShare className='action-icon'/>
+            </div>
+            <div onClick={stopVideo} className='action-icon-container'>
+              {videoIcon ?
+                <BsCameraVideoFill className='action-icon' />
+              : <BsCameraVideoOffFill className='action-icon danger' />
+              }
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
