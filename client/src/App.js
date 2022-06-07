@@ -18,8 +18,11 @@ function App() {
 
   useEffect(()=>{
     socket.connect()
+  },[])
+  useEffect(()=>{
     socket.on("join-room",data=>{
-      toast(data.name + " just entered the meet",{duration: 7000,
+      if(!data) return
+      toast(`${data.name} just entered the meet`,{duration: 7000,
         position: 'top-right',icon: '🖐😆'})
       setUsers(prevUsers=>{
         // role 0 host , role 1 normal
@@ -37,7 +40,6 @@ function App() {
       })
     })
   },[])
-  
   return (
     <>
       <context.Provider value={{socket,roomID,setRoomID,users}}>
