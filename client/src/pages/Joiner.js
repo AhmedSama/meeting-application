@@ -3,13 +3,15 @@ import React, { useContext, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { context } from '../App'
 import {BsCameraVideoFill, BsMicFill} from 'react-icons/bs'
+import { User } from '../components/User'
 
 export const Joiner = () => {
   const navigate = useNavigate()
-  const {socket,roomID,users} = useContext(context)
+  const {socket,roomID,users,setUsers} = useContext(context)
   const peerRef = useRef(new Peer)
   const peerIDRef = useRef(null)
   const videoRef = useRef()
+  
   useEffect(()=>{
     if(!roomID){
       navigate("/")
@@ -42,7 +44,9 @@ export const Joiner = () => {
   return (
     <div className='meet-container'>
       <div className='left'>
-        {/* we have two windows one for users in the meet and other for the chat */}
+        {users.map(user=>{
+          return <User key={user.id} name={user.name} role={user.role}  />
+        })}
       </div>
       <div className='right'>
         <div className='section-top'>

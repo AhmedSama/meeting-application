@@ -4,6 +4,7 @@ import { context } from '../App'
 import { Peer } from "peerjs"
 import {FiShare} from 'react-icons/fi'
 import {BsCameraVideoFill, BsCameraVideoOffFill, BsMicFill} from 'react-icons/bs'
+import { User } from '../components/User'
 
 
 
@@ -97,7 +98,7 @@ export const Creator = () => {
     <div className='meet-container'>
       <div className='left'>
         {users.map(user=>{
-          return <li key={user.id}>{user.name}</li>
+          return <User key={user.id} name={user.name} role={user.role}  />
         })}
       </div>
       <div className='right'>
@@ -114,12 +115,15 @@ export const Creator = () => {
             <div onClick={share} className='action-icon-container'>
               <FiShare className='action-icon'/>
             </div>
-            <div onClick={stopVideo} className='action-icon-container'>
               {videoIcon ?
-                <BsCameraVideoFill className='action-icon' />
-              : <BsCameraVideoOffFill className='action-icon danger' />
+                <div onClick={stopVideo} className='action-icon-container'>
+                  <BsCameraVideoFill className='action-icon' />
+                </div>
+              : 
+                <div onClick={stopVideo} className='action-icon-container danger'>
+                  <BsCameraVideoOffFill className='action-icon ' />
+                </div>
               }
-            </div>
           </div>
         </div>
       </div>

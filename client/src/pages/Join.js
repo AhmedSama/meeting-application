@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom"
 
 
 export const Join = () => {
-    const {socket,setRoomID} =  useContext(context)
+    const {socket,setRoomID,setUsers} =  useContext(context)
 
     const nameRef = useRef()
     const roomIDRef = useRef()
@@ -14,7 +14,11 @@ export const Join = () => {
     const id2 = useId()
 
     const navigate = useNavigate()
-
+    // useEffect(()=>{
+    //   socket.on("users-data",data=>{
+    //     setUsers(data.users)
+    //   })
+    // },[])
     useEffect(()=>{
       socket.on("joiner",data=>{
         console.log(data)
