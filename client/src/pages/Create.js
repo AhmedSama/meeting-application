@@ -5,13 +5,14 @@ import { Link, useNavigate } from "react-router-dom"
 
 
 export const Create = () => {
-    const {socket,setRoomID,setUsers} =  useContext(context)
+    const {socket,setRoomID,setUsers,setName} =  useContext(context)
     const navigate = useNavigate()
     const id = useId()
     const nameRef = useRef()
     useEffect(()=>{
       socket.on("creator",data=>{
         // localStorage.setItem("roomID",data.roomID)
+        setName(data.name)
         setUsers(prevUsers=>{
           return [...prevUsers,{name:data.name,id : Math.random(),role:0}]
         })

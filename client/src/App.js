@@ -15,6 +15,8 @@ function App() {
   const[socket,_] = useState(io(url,{autoConnect:false}))
   const [roomID,setRoomID] = useState(null) 
   const [users,setUsers] = useState([])
+  const [msgs,setMsgs] = useState([{name : "Ahmed", msg : "hello everyone!"}])
+  const [name,setName] = useState(null)
 
   useEffect(()=>{
     socket.connect()
@@ -41,9 +43,16 @@ function App() {
       })
     })
   },[])
+  useEffect(()=>{
+    socket.on("msg", data => {
+      setMsgs(prev=>{
+        return [data,...prev]
+      })
+    })
+  },[])
   return (
     <>
-      <context.Provider value={{socket,roomID,setRoomID,users,setUsers}}>
+      <context.Provider value={{socket,roomID,setRoomID,users,setUsers,msgs,setMsgs,name,setName}}>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Create/>}/>

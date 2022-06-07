@@ -10,7 +10,7 @@ import {FaUsers} from 'react-icons/fa'
 
 
 export const Creator = () => {
-  const {socket,users} = useContext(context)
+  const {socket,users,msgs} = useContext(context)
   const videoRef = useRef()
   const streamRef = useRef(null)
   const navigate = useNavigate()
@@ -53,7 +53,7 @@ export const Creator = () => {
   const captureNewStream = async() =>{
     try {
       streamRef.current = await navigator.mediaDevices.getDisplayMedia({
-        video: { frameRate: { ideal: 100, max: 200 } },
+        video: true,
         audio: true
       });
       videoRef.current.srcObject = streamRef.current
@@ -117,7 +117,7 @@ export const Creator = () => {
               users.map(user=>{
                 return <User key={user.id} name={user.name} role={user.role}  />
               }) :
-              <Chat />
+              <Chat msgs={msgs} />
             
             }
           </div>

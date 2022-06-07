@@ -1,13 +1,17 @@
 import {Peer} from 'peerjs'
-import React, { useContext, useEffect, useRef } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { context } from '../App'
-import {BsCameraVideoFill, BsMicFill} from 'react-icons/bs'
+import {BsCameraVideoFill, BsFillChatSquareTextFill, BsMicFill} from 'react-icons/bs'
 import { User } from '../components/User'
+import { Chat } from '../components/Chat'
+import { FaUsers } from 'react-icons/fa'
 
 export const Joiner = () => {
   const navigate = useNavigate()
-  const {socket,roomID,users,setUsers} = useContext(context)
+  const {socket,roomID,users,msgs} = useContext(context)
+  // sidebar => true for the users , false for the chat
+  const [sidebar,setSideBar] = useState(true)
   const peerRef = useRef(new Peer)
   const peerIDRef = useRef(null)
   const videoRef = useRef()
@@ -41,13 +45,41 @@ export const Joiner = () => {
         });
     });
   },[])
+  const handleSideBar = (e) => {
+    document.querySelectorAll(".action-icon-container.sidebar").forEach(element=>{
+      element.classList.remove("active")
+    })
+    e.currentTarget.classList.add("active")
+    if(e.currentTarget.dataset.chat){
+      setSideBar(false)
+    }
+    else{
+      setSideBar(true)
+    }
+  }
   return (
     <div className='meet-container'>
       <div className='left'>
-        {users.map(user=>{
-          return <User key={user.id} name={user.name} role={user.role}  />
-        })}
-      </div>
+        <div className='section-top'>
+            {sidebar ?
+              users.map(user=>{
+                return <User key={user.id} name={user.name} role={user.role}  />
+              }) :
+              <Chat msgs={msgs} />
+            
+            }
+          </div>
+          <div className='section-bottom flex-center'>
+            <div className='actions sidebar'>
+              <div data-chat={true} onClick={handleSideBar} className='action-icon-container sidebar'>
+                <BsFillChatSquareTextFill className='action-icon' />
+              </div>
+              <div data-users={true} onClick={handleSideBar} className='action-icon-container sidebar active'>
+                <FaUsers className='action-icon' />
+              </div>
+            </div>
+          </div>
+        </div>
       <div className='right'>
         <div className='section-top flex-center'>
           <div className='video-container'>

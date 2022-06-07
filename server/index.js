@@ -56,6 +56,9 @@ io.on('connection', (socket) => {
   socket.on("join-room",data=>{
     socket.to(data.roomID).emit("join-room")
   })
+  socket.on("msg",data=>{
+    io.to(socket.roomID).emit("msg",data)
+  })
   socket.on("disconnect",()=>{
       console.log(socket.id + " disconnected")
       socket.to(socket.roomID).emit("leave-room",{name:socket.name})
