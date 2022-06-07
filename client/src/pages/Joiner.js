@@ -49,12 +49,12 @@ export const Joiner = () => {
         })}
       </div>
       <div className='right'>
-        <div className='section-top'>
+        <div className='section-top flex-center'>
           <div className='video-container'>
             <video autoPlay ref={videoRef} muted></video>
           </div>
         </div>
-        <div className='section-bottom'>
+        <div className='section-bottom flex-center'>
           <div className='actions'>
             <div className='action-icon-container'>
               <BsMicFill className='action-icon' />

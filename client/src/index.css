@@ -11,7 +11,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  transition: 0.3s all ease;
+  transition: 0.1s all ease;
   font-family: 'Poppins', sans-serif;
 }
 
@@ -130,6 +130,8 @@ input::placeholder{
   width: 20%;
   height: 100%;
   background-color: white;
+  display: flex;
+  flex-direction: column;
 }
 .right{
   width: 80%;
@@ -137,25 +139,27 @@ input::placeholder{
   display: flex;
   flex-direction: column;
 }
-.section-top{
-  height: 90%;
-  width:100%;
+.flex-center{
   display: flex;
   align-items: center;
   justify-content: center;
 }
+.section-top{
+  height: 90%;
+  width:100%;
+}
 .section-bottom{
   height: 10%;
   width:100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 .actions{
   width: 30%;
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.actions.sidebar{
+  width: 50%;
 }
 .action-icon-container{
   width: 40px;
@@ -167,9 +171,15 @@ input::placeholder{
   justify-content: center;
   background-color: #454545;
 }
+.action-icon-container.sidebar{
+  background-color: #ffffff;
+}
 .action-icon{
-  font-size: 18px;
+  font-size: 20px;
   color: white;
+}
+.action-icon-container.sidebar .action-icon{
+  color: #454545;
 }
 .action-icon-container.danger{
   background-color: #e1305a;
@@ -178,7 +188,15 @@ input::placeholder{
 .action-icon-container:hover{
   background-color:#656565;
 }
-
+.action-icon-container.sidebar.active{
+  background-color:#656565;
+}
+.action-icon-container.sidebar.active .action-icon{
+  color: white;
+}
+.action-icon-container.sidebar:hover .action-icon{
+  color: white;
+}
 /* user components */
 .user{
   display: flex;
