@@ -14,11 +14,11 @@ export const Join = () => {
     const id2 = useId()
 
     const navigate = useNavigate()
-    // useEffect(()=>{
-    //   socket.on("users-data",data=>{
-    //     setUsers(data.users)
-    //   })
-    // },[])
+    useEffect(()=>{
+      socket.on("users-data",data=>{
+        setUsers(data.users)
+      })
+    },[])
     useEffect(()=>{
       socket.on("joiner",data=>{
         console.log(data)

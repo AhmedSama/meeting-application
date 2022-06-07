@@ -37,13 +37,13 @@ io.on('connection', (socket) => {
         console.log(data)
         socket.emit("joiner",{ok:true,roomID:roomID,...data})
         socket.broadcast.to(roomID).emit("join-room",{ ok : true, name : data.name })
-        // let connectedUsersData;
-        // io.in(roomID).fetchSockets().then(sockets=>{
-        //   connectedUsersData = sockets.map(s=>{
-        //     return {name : s.name,role:s.role,id:Math.random()}
-        //   })
-        //   socket.emit("users-data",{users : connectedUsersData})
-        // })
+        let connectedUsersData;
+        io.in(roomID).fetchSockets().then(sockets=>{
+          connectedUsersData = sockets.map(s=>{
+            return {name : s.name,role:s.role,id:Math.random()}
+          })
+          socket.emit("users-data",{users : connectedUsersData})
+        })
     }
     else{
         socket.emit("joiner",{ok:false,msg:"roomID is not existed, please check your room ID or create new meet"})

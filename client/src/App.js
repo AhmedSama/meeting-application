@@ -19,8 +19,9 @@ function App() {
   useEffect(()=>{
     socket.connect()
     socket.on("join-room",data=>{
+      if(!data) return
       console.log("data is : " + data)
-      toast(data?.name + " just entered the meet",{duration: 7000,
+      toast(data.name + " just entered the meet",{duration: 7000,
         position: 'top-right',icon: '😃'})
       setUsers(prevUsers=>{
         // role 0 host , role 1 normal
@@ -29,7 +30,7 @@ function App() {
       
     })
     socket.on("leave-room",data=>{
-      toast(data.name + " has leaved the meet",{duration: 7000,
+      toast(data.name + " has left the meet",{duration: 7000,
         position: 'top-right',icon: '🥺'})
       setUsers(prevUsers=>{
         return prevUsers.filter(user=>{
