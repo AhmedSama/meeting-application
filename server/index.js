@@ -19,19 +19,31 @@ io.on('connection', (socket) => {
   socket.on("create",data=>{
     console.log(data)
     const roomID = uuid()
+    socket.name = data.name
+    socket.roomID = roomID
+    socket.role = 0
     socket.join(roomID)
     socket.emit("creator",{
-        roomID,
+        roomID,...data
     })
   })
-  socket.on("join",data=>{
+  socket.on("join",data => {
     if(io.of("/").adapter.rooms.has(data.roomID)){
         const roomID = data.roomID
         socket.name = data.name
         socket.roomID = data.roomID
+        socket.role = 1
         socket.join(roomID)
+        console.log(data)
         socket.emit("joiner",{ok:true,roomID:roomID,...data})
-        socket.to(roomID).emit("join-room",{ok:true,...data})
+        socket.broadcast.to(roomID).emit("join-room",{ ok : true, name : data.name })
+        let connectedUsersData;
+        io.in(roomID).fetchSockets().then(sockets=>{
+          connectedUsersData = sockets.map(s=>{
+            return {name : s.name,role:s.role,id:Math.random()}
+          })
+          socket.emit("users-data",{users : connectedUsersData})
+        })
     }
     else{
         socket.emit("joiner",{ok:false,msg:"roomID is not existed, please check your room ID or create new meet"})

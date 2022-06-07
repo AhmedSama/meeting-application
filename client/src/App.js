@@ -1,4 +1,4 @@
-import { createContext, useEffect, useRef, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import {BrowserRouter,Routes,Route} from "react-router-dom"
 import { io } from "socket.io-client";
 import { Create } from "./pages/Create";
@@ -22,8 +22,9 @@ function App() {
   useEffect(()=>{
     socket.on("join-room",data=>{
       if(!data) return
-      toast(`${data.name} just entered the meet`,{duration: 7000,
-        position: 'top-right',icon: '🖐😆'})
+      console.log("data is : " + data)
+      toast(data.name + " just entered the meet",{duration: 7000,
+        position: 'top-right',icon: '😃'})
       setUsers(prevUsers=>{
         // role 0 host , role 1 normal
         return [...prevUsers,{name : data.name, id : Math.random(),role:1}]
@@ -31,8 +32,8 @@ function App() {
       
     })
     socket.on("leave-room",data=>{
-      toast(data.name + " leaved the meet",{duration: 7000,
-        position: 'top-right',icon: '👋🥺'})
+      toast(data.name + " has left the meet",{duration: 7000,
+        position: 'top-right',icon: '🥺'})
       setUsers(prevUsers=>{
         return prevUsers.filter(user=>{
           return user.name !== data.name
@@ -42,7 +43,7 @@ function App() {
   },[])
   return (
     <>
-      <context.Provider value={{socket,roomID,setRoomID,users}}>
+      <context.Provider value={{socket,roomID,setRoomID,users,setUsers}}>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Create/>}/>
