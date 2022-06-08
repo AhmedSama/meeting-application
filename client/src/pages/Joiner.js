@@ -60,7 +60,13 @@ export const Joiner = () => {
   return (
     <div className='meet-container'>
       <div className='left'>
-        <div className='section-top'>
+        <div className='section-top flex-column'>
+            {
+              sidebar ?
+              <h1 className='title border-bottom'>all users</h1>
+              :
+              <h1 className='title border-bottom'>chat messages</h1>
+            }
             {sidebar ?
               users.map(user=>{
                 return <User key={user.id} name={user.name} role={user.role}  />
@@ -69,7 +75,7 @@ export const Joiner = () => {
             
             }
           </div>
-          <div className='section-bottom flex-center'>
+          <div className='section-bottom flex-center border-top'>
             <div className='actions sidebar'>
               <div data-chat={true} onClick={handleSideBar} className='action-icon-container sidebar'>
                 <BsFillChatSquareTextFill className='action-icon' />
