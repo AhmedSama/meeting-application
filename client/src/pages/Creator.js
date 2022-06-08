@@ -12,7 +12,8 @@ import {FaUsers} from 'react-icons/fa'
 export const Creator = () => {
   const {socket,users,msgs} = useContext(context)
   const videoRef = useRef()
-  const streamRef = useRef(null)
+  const captureStreamRef = useRef(null)
+  const audioStreamRef = useRef(null)
   const navigate = useNavigate()
   const {roomID} = useContext(context)
   const peerRef = useRef(new Peer())
@@ -37,12 +38,25 @@ export const Creator = () => {
       call(data.peerID)
     })
   },[])
+
+  const getAudioStream = () => {
+    try{
+        navigator.mediaDevices.getUserMedia({audio:true})
+        .then(stream=>{
+          return stream;
+        })
+    }
+    catch(err){
+      console.error("audio stream denied")
+      return null
+    }
+  }
   const stopStream = () => {
-    streamRef.current.getVideoTracks()[0]?.stop()
-    streamRef.current.getAudioTracks()[0]?.stop()
+      captureStreamRef.current.getVideoTracks()[0]?.stop()
+      captureStreamRef.current.getAudioTracks()[0]?.stop()
   }
   const call = (peerID) => {
-    const c = peerRef.current.call(peerID,streamRef.current)
+    const c = peerRef.current.call(peerID,captureStreamRef.current)
     peerConnectionsRef.current.push(c.peerConnection)
     c.on('stream', function(remoteStream) {
       const video = document.createElement("video")
@@ -52,18 +66,17 @@ export const Creator = () => {
   }
   const captureNewStream = async() =>{
     try {
-      streamRef.current = await navigator.mediaDevices.getDisplayMedia({
+      captureStreamRef.current = await navigator.mediaDevices.getDisplayMedia({
         video: true,
         audio: true
       });
-      videoRef.current.srcObject = streamRef.current
+      videoRef.current.srcObject = captureStreamRef.current
     } catch(err) {
       console.error("Error: " + err);
     }
   }
   const changeCurrentStream = async() =>{
     // .peerConnection.getSenders()[0].replaceTrack(newTrack)
-    console.log("change stream")
     try {
       const newStream = await navigator.mediaDevices.getDisplayMedia({
         video: true,
@@ -71,7 +84,7 @@ export const Creator = () => {
       })
       videoRef.current.srcObject = newStream
       stopStream()
-      streamRef.current = newStream
+      captureStreamRef.current = newStream
       const tracks = newStream.getVideoTracks()[0]
       tracks.enabled = true;
       if(newStream){
@@ -85,7 +98,7 @@ export const Creator = () => {
     }
   }
   const share = async() => {
-    if(streamRef.current === null){
+    if(captureStreamRef.current === null){
       captureNewStream()
     }
     else{
@@ -94,8 +107,8 @@ export const Creator = () => {
 
   }
   const stopVideo = () => {
-    streamRef.current.getVideoTracks()[0].enabled = streamRef.current.getVideoTracks()[0].enabled ? false : true
-    setVideoIcon(streamRef.current.getVideoTracks()[0].enabled)
+    captureStreamRef.current.getVideoTracks()[0].enabled = captureStreamRef.current.getVideoTracks()[0].enabled ? false : true
+    setVideoIcon(captureStreamRef.current.getVideoTracks()[0].enabled)
   }
   const handleSideBar = (e) => {
     document.querySelectorAll(".action-icon-container.sidebar").forEach(element=>{
@@ -112,7 +125,13 @@ export const Creator = () => {
   return (
     <div className='meet-container'>
       <div className='left'>
-          <div className='section-top'>
+          <div className='section-top flex-column'>
+            {
+              sidebar ?
+              <h1 className='title border-bottom'>all users</h1>
+              :
+              <h1 className='title border-bottom'>chat messages</h1>
+            }
             {sidebar ?
               users.map(user=>{
                 return <User key={user.id} name={user.name} role={user.role}  />
@@ -121,7 +140,7 @@ export const Creator = () => {
             
             }
           </div>
-          <div className='section-bottom flex-center'>
+          <div className='section-bottom flex-center border-top'>
             <div className='actions sidebar'>
               <div data-chat={true} onClick={handleSideBar} className='action-icon-container sidebar'>
                 <BsFillChatSquareTextFill className='action-icon' />

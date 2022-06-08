@@ -8,8 +8,9 @@ export const Chat = ({msgs}) => {
   const msgsContainerRef = useRef()
 
 
-  const sendMsg = () => {
-    if(msgRef.current.value === "") return
+  const sendMsg = (e) => {
+    
+    if(msgRef.current.value.trim() === "") return
     const data = {
       name : name,
       msg : msgRef.current.value 
@@ -18,20 +19,25 @@ export const Chat = ({msgs}) => {
     msgRef.current.value = ""
     msgRef.current.focus()
   }
+  const handleEnterKey = (e) => {
+    if(e.key === "Enter"){
+      sendMsg()
+    }
+  }
   return (
     <div className="chat-container">
       <div ref={msgsContainerRef} className="msgs">
         {msgs.map(msg=>{
           return <div className="msg" key={Math.random()}>
             <div className="msg-name">{msg.name}</div>
-            <div className="msg-content">{msg.msg}</div>
+              <div className="msg-content">{msg.msg}</div>
           </div>
         })}
       </div>
       <div className="inputs">
-        <textarea ref={msgRef} className="msg-input" type="text" placeholder="enter a message" />
-        <div onClick={sendMsg} className="send-icon">
-          <BiSend className="icon" />
+        <textarea onKeyDown={handleEnterKey} cols={1} rows={1} ref={msgRef} className="msg-input" type="text" placeholder="enter a message" />
+        <div onClick={sendMsg} className="send-icon-container">
+          <BiSend className="send-icon" />
         </div>
       </div>
     </div>

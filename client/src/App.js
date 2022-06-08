@@ -15,7 +15,7 @@ function App() {
   const[socket,_] = useState(io(url,{autoConnect:false}))
   const [roomID,setRoomID] = useState(null) 
   const [users,setUsers] = useState([])
-  const [msgs,setMsgs] = useState([{name : "Ahmed", msg : "hello everyone!"}])
+  const [msgs,setMsgs] = useState([])
   const [name,setName] = useState(null)
 
   useEffect(()=>{
@@ -35,7 +35,7 @@ function App() {
     })
     socket.on("leave-room",data=>{
       toast(data.name + " has left the meet",{duration: 7000,
-        position: 'top-right',icon: '🥺'})
+        position: 'top-right',icon: '😢'})
       setUsers(prevUsers=>{
         return prevUsers.filter(user=>{
           return user.name !== data.name
@@ -43,10 +43,18 @@ function App() {
       })
     })
   },[])
+  const hasTheSameName = (theName) => {
+    if(msgs){
+      const lastMsg = msgs[msgs.length - 1]
+      const lastMsgName = lastMsg.name
+      return theName === lastMsgName
+    }
+    return false
+  }
   useEffect(()=>{
     socket.on("msg", data => {
-      setMsgs(prev=>{
-        return [data,...prev]
+      setMsgs(prevMsgs=>{
+        return [data,...prevMsgs]
       })
     })
   },[])

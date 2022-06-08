@@ -36,6 +36,12 @@ a{
   text-align: center;
   font-weight: 400;
 }
+.border-bottom{
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+.border-top{
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
 .small{
   font-size: 15px;
   font-weight: 300;
@@ -142,6 +148,10 @@ input::placeholder{
   align-items: center;
   justify-content: center;
 }
+.flex-column{
+  display: flex;
+  flex-direction: column;
+}
 .section-top{
   height: 90%;
   width:100%;
@@ -180,7 +190,7 @@ input::placeholder{
   color: #454545;
 }
 .action-icon-container.danger{
-  background-color: #e1305a;
+  background-color: #fd0c44;
 }
 
 .action-icon-container:hover{
@@ -228,56 +238,65 @@ input::placeholder{
   flex-direction: column;
 }
 .msgs{
-  height: 85%;
+  flex: 1;
   overflow-x: hidden;
   overflow-y: scroll;
   display: flex;
   flex-direction: column-reverse;
+  margin: 5px 30px;
 }
 .inputs{
-  height: 15%;
   display: flex;
   align-items: center;
-  gap: 10px;
+  border: var(--border);
+  margin: 10px;
+  padding: 5px;
+  border-radius: 100px;
+  overflow: hidden;
 }
 .msg-input{
-  padding: 10px;
+  padding: 0 10px;
   outline: none;
-  border: var(--border);
+  border: none;
   border-radius: var(--radius);
   color: var(--color);
   font-size: 13px;
-  width: 80%;
+  flex-grow: 1;
   resize: none;
 }
 .msg{
-  margin: 10px;
   display: flex;
   flex-direction: column;
+  border: var(--border);
+  padding: 5px 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
 }
 .msg-name{
-  font-size: 17px;
+  font-size: 13px;
   font-weight: 400;
 }
 .msg-content{
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 300;
-  white-space: pre;
   overflow-wrap: break-word;
 }
-.send-icon{
+.send-icon-container{
   color: #008fd7;
   width: 50px;
   height: 50px;
   border-radius: 50%;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.send-icon:hover{
-  background-color: #c5c5c5;
+.send-icon-container:hover{
+  background-color: #e8e8e8;
 }
-
+.send-icon{
+  font-size: 20px;
+}
 ::-webkit-scrollbar {
   width: 0;
 }
