@@ -7,10 +7,10 @@ import {BsCameraVideoFill, BsCameraVideoOffFill, BsFillChatSquareTextFill, BsMic
 import { User } from '../components/User'
 import { Chat } from '../components/Chat'
 import {FaUsers} from 'react-icons/fa'
+import msgAudioSrc from "../sounds/msg.mp3"
 
-
-export const Creator = () => {
-  const {socket,users,msgs} = useContext(context)
+export const Creator = ({toast}) => {
+  const {socket,users,msgs,setMsgs,name} = useContext(context)
   const videoRef = useRef()
   const captureStreamRef = useRef(null)
   const audioStreamRef = useRef(null)
@@ -21,8 +21,11 @@ export const Creator = () => {
   const peerConnectionsRef = useRef([])
   const peerIDsRef = useRef([])
   const [videoIcon,setVideoIcon] = useState(true)
+  const [circleNotify,setCircleNotify] = useState(false)
+  const [playMsgSound,setPlayMsgSound] = useState(false)
   // sidebar => true for the users , false for the chat
   const [sidebar,setSideBar] = useState(true)
+  let msgSound =  new Audio(msgAudioSrc) 
   useEffect(()=>{
     if(!roomID)
       navigate("/")
@@ -30,21 +33,71 @@ export const Creator = () => {
       peerIDRef.current = peerID
     })
   },[])
+
+  useEffect(()=>{
+    if(playMsgSound){
+      msgSound.currentTime = 0
+      msgSound.play()
+    }
+  },[playMsgSound])
+
   useEffect(()=>{
     socket.on("recv-peerID",data=>{
-      console.log(data)
+      socket.emit("send-peerIDs",{peerIDs : peerIDsRef.current,socketID : data.socketID})
       peerIDsRef.current.push(data.peerID)
       // call
       call(data.peerID)
     })
   },[])
+  useEffect(()=>{
+    const getIt = async() => {
+      audioStreamRef.current = await getAudioStream()
+      captureStreamRef.current = await getVideoStream()
+      captureStreamRef.current.getVideoTracks()[0].enabled = false
+    }
+    getIt()
+    
+  },[])
 
-  const getAudioStream = () => {
+  useEffect(()=>{
+    socket.on("msg", data => {
+      if(data.name !== name){
+        // msgSound.currentTime = 0
+        // msgSound.play()
+        toast(data.name + " just sent a message: \n" + data.msg,{duration: 7000,
+          position: 'bottom-right',icon: '📩',style: {
+            borderRadius: '10px',
+            background: '#333',
+            color: '#fff',
+          }})
+          if(sidebar){
+            setCircleNotify(true)
+          }
+          setPlayMsgSound(true)
+      }
+      setMsgs(prevMsgs=>{
+        return [data,...prevMsgs]
+      })
+    })
+
+    return ()=>{
+      socket.off("msg")
+    }
+  },[name])
+  const getVideoStream = async() => {
     try{
-        navigator.mediaDevices.getUserMedia({audio:true})
-        .then(stream=>{
-          return stream;
-        })
+        const videoStream = await navigator.mediaDevices.getUserMedia({video:{ width: 1280 * 5, height: 720 * 5}})
+        return videoStream
+    }
+    catch(err){
+      console.error("video stream denied")
+      return null
+    }
+  }
+  const getAudioStream = async() => {
+    try{
+        const audioStream = await navigator.mediaDevices.getUserMedia({audio:true})
+        return audioStream
     }
     catch(err){
       console.error("audio stream denied")
@@ -52,23 +105,41 @@ export const Creator = () => {
     }
   }
   const stopStream = () => {
-      captureStreamRef.current.getVideoTracks()[0]?.stop()
-      captureStreamRef.current.getAudioTracks()[0]?.stop()
+      captureStreamRef.current?.getVideoTracks()[0]?.stop()
+      captureStreamRef.current?.getAudioTracks()[0]?.stop()
   }
   const call = (peerID) => {
-    const c = peerRef.current.call(peerID,captureStreamRef.current)
-    peerConnectionsRef.current.push(c.peerConnection)
-    c.on('stream', function(remoteStream) {
-      const video = document.createElement("video")
-      video.srcObject = remoteStream
-      video.play()
-    })
+    // const c = peerRef.current.call(peerID,new MediaStream())
+    // peerConnectionsRef.current.push(c.peerConnection)
+    // c.on('stream', function(remoteStream) {
+    //   const video = document.createElement("video")
+    //   video.srcObject = remoteStream
+    //   video.play()
+    // })
+    if(captureStreamRef.current === null){
+      const c = peerRef.current.call(peerID,audioStreamRef.current)
+      peerConnectionsRef.current.push(c.peerConnection)
+      c.on('stream', function(remoteStream) {
+        const video = document.createElement("video")
+        video.srcObject = remoteStream
+        video.play()
+      })
+    }
+    else{
+      const mixStream = new MediaStream([...captureStreamRef.current.getVideoTracks(),...audioStreamRef.current.getAudioTracks()])
+      const c = peerRef.current.call(peerID,mixStream)
+      peerConnectionsRef.current.push(c.peerConnection)
+      c.on('stream', function(remoteStream) {
+        const video = document.createElement("video")
+        video.srcObject = remoteStream
+        video.play()
+      })
+    }
   }
   const captureNewStream = async() =>{
     try {
       captureStreamRef.current = await navigator.mediaDevices.getDisplayMedia({
-        video: true,
-        audio: true
+        video: true
       });
       videoRef.current.srcObject = captureStreamRef.current
     } catch(err) {
@@ -77,34 +148,37 @@ export const Creator = () => {
   }
   const changeCurrentStream = async() =>{
     // .peerConnection.getSenders()[0].replaceTrack(newTrack)
-    try {
+
       const newStream = await navigator.mediaDevices.getDisplayMedia({
-        video: true,
-        audio: true
+        video: { width: 1280 * 5, height: 720 * 5 }
+        // video : true
       })
       videoRef.current.srcObject = newStream
       stopStream()
       captureStreamRef.current = newStream
-      const tracks = newStream.getVideoTracks()[0]
-      tracks.enabled = true;
+      const videoTrack = newStream.getVideoTracks()[0]
+      videoTrack.enabled = true;
       if(newStream){
         for(let peerConnection of peerConnectionsRef.current){
-          peerConnection.getSenders()[0].replaceTrack(tracks)
+          const sender = peerConnection.getSenders().find(s=>s.track.kind === videoTrack.kind)
+          if(sender){
+            sender.replaceTrack(videoTrack)
+          }
+          else{
+            peerConnection.addTrack(videoTrack,newStream)
+            // peerConnection.getSenders().find(s=>s.track.kind === videoTrack.kind).replaceTrack(videoTrack)
+          }
         }
       }
 
-    } catch(err) {
-      console.error("Error: " + err);
-    }
   }
   const share = async() => {
-    if(captureStreamRef.current === null){
-      captureNewStream()
-    }
-    else{
+    // if(captureStreamRef.current === null && audioStreamRef.current == null){
+    //   captureNewStream()
+    // }
+    // else{
       changeCurrentStream()
-    }
-
+    // }
   }
   const stopVideo = () => {
     captureStreamRef.current.getVideoTracks()[0].enabled = captureStreamRef.current.getVideoTracks()[0].enabled ? false : true
@@ -117,11 +191,15 @@ export const Creator = () => {
     e.currentTarget.classList.add("active")
     if(e.currentTarget.dataset.chat){
       setSideBar(false)
+      setCircleNotify(false)
     }
     else{
       setSideBar(true)
+      setCircleNotify(false)
+      setPlayMsgSound(false)
     }
   }
+
   return (
     <div className='meet-container'>
       <div className='left'>
@@ -137,12 +215,16 @@ export const Creator = () => {
                 return <User key={user.id} name={user.name} role={user.role}  />
               }) :
               <Chat msgs={msgs} />
-            
             }
           </div>
           <div className='section-bottom flex-center border-top'>
             <div className='actions sidebar'>
               <div data-chat={true} onClick={handleSideBar} className='action-icon-container sidebar'>
+                {sidebar && circleNotify ?
+                <div className='circle'></div>
+                : null
+                }
+
                 <BsFillChatSquareTextFill className='action-icon' />
               </div>
               <div data-users={true} onClick={handleSideBar} className='action-icon-container sidebar active'>

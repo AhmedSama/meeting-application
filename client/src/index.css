@@ -75,7 +75,7 @@ a{
   border: var(--border);
   border-radius: var(--radius);
   color: var(--color);
-  font-size: 20px;
+  font-size: 15px;
 }
 
 input::placeholder{
@@ -88,7 +88,6 @@ input::placeholder{
   padding:5px 10px;
   color: white;
   border-radius: var(--radius);
-  font-size: 10px;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -101,7 +100,7 @@ input::placeholder{
   color: var(--bg-color);
 }
 .btn-text{
-  font-size: 25px;
+  font-size: 17px;
   font-weight: 400;
 }
 .icon{
@@ -116,7 +115,7 @@ input::placeholder{
 }
 
 .video-container{
-  --ratio : 1;
+  --ratio : 1.2;
   width: calc(852px * var(--ratio)) ;
   height: calc(480px * var(--ratio));
   overflow: hidden;
@@ -178,6 +177,16 @@ input::placeholder{
   align-items: center;
   justify-content: center;
   background-color: #454545;
+  position: relative;
+}
+.circle{
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #fd0c44;
 }
 .action-icon-container.sidebar{
   background-color: #ffffff;
@@ -233,7 +242,7 @@ input::placeholder{
 
 .chat-container{
   width: 100%;
-  height: 100%;
+  height: 90%;
   display: flex;
   flex-direction: column;
 }
@@ -270,7 +279,8 @@ input::placeholder{
   border: var(--border);
   padding: 5px 10px;
   border-radius: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
+  margin-top: 5px;
 }
 .msg-name{
   font-size: 13px;
@@ -283,8 +293,8 @@ input::placeholder{
 }
 .send-icon-container{
   color: #008fd7;
-  width: 50px;
-  height: 50px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
@@ -292,7 +302,7 @@ input::placeholder{
   justify-content: center;
 }
 .send-icon-container:hover{
-  background-color: #e8e8e8;
+  background-color: rgba(0, 0, 0, 0.1);
 }
 .send-icon{
   font-size: 20px;

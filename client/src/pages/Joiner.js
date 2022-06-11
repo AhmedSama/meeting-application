@@ -6,16 +6,27 @@ import {BsCameraVideoFill, BsFillChatSquareTextFill, BsMicFill} from 'react-icon
 import { User } from '../components/User'
 import { Chat } from '../components/Chat'
 import { FaUsers } from 'react-icons/fa'
+import msgAudioSrc from "../sounds/msg.mp3"
 
-export const Joiner = () => {
+export const Joiner = ({toast}) => {
   const navigate = useNavigate()
-  const {socket,roomID,users,msgs} = useContext(context)
+  const {socket,roomID,users,msgs,setMsgs,name} = useContext(context)
   // sidebar => true for the users , false for the chat
   const [sidebar,setSideBar] = useState(true)
+  const [circleNotify,setCircleNotify] = useState(false)
   const peerRef = useRef(new Peer)
   const peerIDRef = useRef(null)
+  const streamRef = useRef(null)
   const videoRef = useRef()
-  
+  const [playMsgSound,setPlayMsgSound] = useState(false)
+  const [peerConnection,setPeerConnection] = useState(null)
+  let msgSound =  new Audio(msgAudioSrc) 
+  // useEffect(()=>{
+  //   if(sidebar && circleNotify){
+  //     msgSound.currentTime = 0
+  //     msgSound.play()
+  //   }
+  // },[circleNotify,sidebar])
   useEffect(()=>{
     if(!roomID){
       navigate("/")
@@ -30,21 +41,109 @@ export const Joiner = () => {
       socket.emit("send-peerID",data)
     })
   },[])
+
+  const getAudioTracks = (stream) => {
+    // return stream.getTracks().find(track=>track.kind === "audio")
+    try{
+      return stream.getAudioTracks()
+    }
+    catch(err){
+      return null
+    }
+  }
+  const getVideoTracks = (stream) => {
+    // return stream.getTracks().find(track=>track.kind === "video")
+    try{
+      return stream.getVideoTracks()
+    }
+    catch(err){
+      return null
+    }
+  }
   useEffect(()=>{
-    let getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-    peerRef.current.on('call', function(call) {
-        console.log("on call")
-        getUserMedia({audio: true}, function(stream) {
-          call.answer(stream)
-          call.on('stream', function(remoteStream) {
-              
-              videoRef.current.srcObject = remoteStream
-            });
-          }, function(err) {
-            console.log('Failed to get local stream' ,err);
-        });
-    });
+    if(playMsgSound){
+      msgSound.currentTime = 0
+      msgSound.play()
+    }
+  },[playMsgSound])
+  useEffect(()=>{
+    socket.on("recv-peerIDs",data=>{
+      if(data.peerIDs.length > 0){
+        callAll(data.peerIDs)
+      }
+    })
   },[])
+  const callAll = (peerIDs) => {
+    console.log(peerIDs)
+    for(let pID of peerIDs){
+      call(pID)
+    }
+  } 
+  const call = (peerID) => {
+    console.log(peerID)
+    try{
+      const c = peerRef.current.call(peerID,streamRef.current)
+      c.on('stream', function(remoteStream) {
+        const video = document.createElement("video")
+        video.srcObject = remoteStream
+        video.play()
+      })
+    }
+    catch(error){
+        console.log(error)
+    }
+  }
+  useEffect(()=>{
+    const run = async () => {
+      streamRef.current = await navigator.mediaDevices.getUserMedia({audio:true})
+    }
+    run()
+  },[])
+  useEffect(()=>{
+    peerRef.current.on('call', async function(call) {
+      console.log("answering")
+      call.answer(streamRef.current)
+      call.on('stream', function(remoteStream) {
+          const videoTracks = getVideoTracks(remoteStream)
+          // const audioTracks = getAudioTracks(remoteStream)
+
+          if(videoTracks.length > 0){
+            videoRef.current.srcObject = remoteStream
+          }
+          else{
+            console.log("audio answer")
+            const video = document.createElement("video")
+            video.srcObject = remoteStream
+            video.play()
+          }
+        })
+    })
+  },[streamRef])
+  useEffect(()=>{
+    socket.on("msg", data => {
+      if(data.name !== name){
+        // msgSound.currentTime = 0
+        // msgSound.play()
+        toast(data.name + " just sent a message: \n" + data.msg,{duration: 7000,
+          position: 'bottom-right',icon: '📩',style: {
+            borderRadius: '10px',
+            background: '#333',
+            color: '#fff',
+          }})
+          if(sidebar){
+            setCircleNotify(true)
+          }
+          setPlayMsgSound(true)
+      }
+      setMsgs(prevMsgs=>{
+        return [data,...prevMsgs]
+      })
+    })
+
+    return ()=>{
+      socket.off("msg")
+    }
+  },[name])
   const handleSideBar = (e) => {
     document.querySelectorAll(".action-icon-container.sidebar").forEach(element=>{
       element.classList.remove("active")
@@ -52,9 +151,12 @@ export const Joiner = () => {
     e.currentTarget.classList.add("active")
     if(e.currentTarget.dataset.chat){
       setSideBar(false)
+      setCircleNotify(false)
     }
     else{
       setSideBar(true)
+      setCircleNotify(false)
+      setPlayMsgSound(false)
     }
   }
   return (
@@ -78,6 +180,11 @@ export const Joiner = () => {
           <div className='section-bottom flex-center border-top'>
             <div className='actions sidebar'>
               <div data-chat={true} onClick={handleSideBar} className='action-icon-container sidebar'>
+                {
+                  sidebar && circleNotify?
+                  <div className='circle'></div>
+                  : null
+                }
                 <BsFillChatSquareTextFill className='action-icon' />
               </div>
               <div data-users={true} onClick={handleSideBar} className='action-icon-container sidebar active'>

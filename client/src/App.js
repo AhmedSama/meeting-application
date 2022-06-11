@@ -24,7 +24,6 @@ function App() {
   useEffect(()=>{
     socket.on("join-room",data=>{
       if(!data) return
-      console.log("data is : " + data)
       toast(data.name + " just entered the meet",{duration: 7000,
         position: 'top-right',icon: '😃'})
       setUsers(prevUsers=>{
@@ -51,31 +50,16 @@ function App() {
     }
     return false
   }
-  useEffect(()=>{
-    socket.on("msg", data => {
-      if(data.name !== name){
-        console.log(name, " " , data.name)
-        toast(data.name + " sent a message to the chat : " + data.msg,{duration: 7000,
-          position: 'bottom-right',icon: '📩'})
-      }
-      setMsgs(prevMsgs=>{
-        return [data,...prevMsgs]
-      })
-    })
-
-    return ()=>{
-      socket.off("msg")
-    }
-  },[name])
+  
   return (
     <>
       <context.Provider value={{socket,roomID,setRoomID,users,setUsers,msgs,setMsgs,name,setName}}>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Create/>}/>
-            <Route path="/:id" element={<Creator/>}/>
+            <Route path="/:id" element={<Creator toast={toast}/>}/>
             <Route path="/join" element={<Join/>}/>
-            <Route path="/join/:id" element={<Joiner/>}/>
+            <Route path="/join/:id" element={<Joiner toast={toast}/>}/>
           </Routes>
         </BrowserRouter>
       </context.Provider>

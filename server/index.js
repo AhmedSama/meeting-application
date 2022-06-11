@@ -50,8 +50,11 @@ io.on('connection', (socket) => {
     }  
   })
   socket.on("send-peerID",data=>{
-    console.log(data)
+    data = {...data, socketID : socket.id}
     socket.to(data.roomID).emit("recv-peerID",data)
+  })
+  socket.on("send-peerIDs",data=>{
+    socket.to(data.socketID).emit("recv-peerIDs",{peerIDs : data.peerIDs})
   })
   socket.on("join-room",data=>{
     socket.to(data.roomID).emit("join-room")
