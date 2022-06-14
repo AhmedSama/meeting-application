@@ -2,7 +2,7 @@ import {Peer} from 'peerjs'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { context } from '../App'
-import {BsCameraVideoFill, BsFillChatSquareTextFill, BsList, BsMicFill} from 'react-icons/bs'
+import {BsCameraVideoFill, BsFillChatSquareTextFill, BsList, BsMicFill, BsMicMuteFill} from 'react-icons/bs'
 import { User } from '../components/User'
 import { Chat } from '../components/Chat'
 import { FaUsers } from 'react-icons/fa'
@@ -19,6 +19,7 @@ export const Joiner = ({toast}) => {
   const peerRef = useRef(new Peer)
   const peerIDRef = useRef(null)
   const streamRef = useRef(null)
+  const [audioIcon,setAudioIcon] = useState(true)
   const videoRef = useRef()
   const [playMsgSound,setPlayMsgSound] = useState(false)
   let msgSound =  new Audio(msgAudioSrc) 
@@ -136,6 +137,11 @@ export const Joiner = ({toast}) => {
       socket.off("msg")
     }
   },[name])
+
+  const toggleAudio  = () => {
+    streamRef.current.getAudioTracks()[0].enabled = streamRef.current.getAudioTracks()[0].enabled ? false : true
+    setAudioIcon(streamRef.current.getAudioTracks()[0].enabled)
+  }
   const handleSideBar = (e) => {
     document.querySelectorAll(".action-icon-container.sidebar").forEach(element=>{
       element.classList.remove("active")
@@ -198,9 +204,16 @@ export const Joiner = ({toast}) => {
         </div>
         <div className='section-bottom flex-center'>
           <div className='actions'>
-            <div className='action-icon-container'>
+          {
+            audioIcon ?
+            <div onClick={toggleAudio} className='action-icon-container'>
               <BsMicFill className='action-icon' />
             </div>
+            :
+            <div onClick={toggleAudio} className='action-icon-container danger'>
+              <BsMicMuteFill className='action-icon' />
+            </div>
+            }
             <div className='action-icon-container'>
               <BsCameraVideoFill className='action-icon' />
             </div>

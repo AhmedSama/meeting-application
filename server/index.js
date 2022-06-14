@@ -27,9 +27,16 @@ io.on('connection', (socket) => {
         roomID,...data
     })
   })
-  socket.on("join",data => {
+  socket.on("join",async(data) => {
+    const sockets = await io.in(data.roomID).fetchSockets()
+    sockets.forEach(s=>{
+      if(s.name === data.name){
+        data.name = data.name + "#" + Math.floor(Math.random()*100).toString()
+      }
+    })
     if(io.of("/").adapter.rooms.has(data.roomID)){
-        const roomID = data.roomID
+
+        const roomID = data.roomID       
         socket.name = data.name
         socket.roomID = data.roomID
         socket.role = 1

@@ -22,6 +22,7 @@ export const Creator = ({toast}) => {
   const peerConnectionsRef = useRef([])
   const peerIDsRef = useRef([])
   const [videoIcon,setVideoIcon] = useState(true)
+  const [audioIcon,setAudioIcon] = useState(true)
   const [circleNotify,setCircleNotify] = useState(false)
   const [playMsgSound,setPlayMsgSound] = useState(false)
   // sidebar => true for the users , false for the chat
@@ -165,9 +166,13 @@ export const Creator = ({toast}) => {
       changeCurrentStream()
     // }
   }
-  const stopVideo = () => {
+  const toggleVideo = () => {
     captureStreamRef.current.getVideoTracks()[0].enabled = captureStreamRef.current.getVideoTracks()[0].enabled ? false : true
     setVideoIcon(captureStreamRef.current.getVideoTracks()[0].enabled)
+  }
+  const toggleAudio  = () => {
+    audioStreamRef.current.getAudioTracks()[0].enabled = audioStreamRef.current.getAudioTracks()[0].enabled ? false : true
+    setAudioIcon(audioStreamRef.current.getAudioTracks()[0].enabled)
   }
   const handleSideBar = (e) => {
     document.querySelectorAll(".action-icon-container.sidebar").forEach(element=>{
@@ -231,18 +236,25 @@ export const Creator = ({toast}) => {
         </div>
         <div className='section-bottom flex-center'>
           <div className='actions'>
-            <div className='action-icon-container'>
+            {
+              audioIcon ?
+            <div onClick={toggleAudio} className='action-icon-container'>
               <BsMicFill className='action-icon' />
             </div>
+            :
+            <div onClick={toggleAudio} className='action-icon-container danger'>
+              <BsMicMuteFill className='action-icon' />
+            </div>
+            }
             <div onClick={share} className='action-icon-container'>
               <FiShare className='action-icon'/>
             </div>
               {videoIcon ?
-                <div onClick={stopVideo} className='action-icon-container'>
+                <div onClick={toggleVideo} className='action-icon-container'>
                   <BsCameraVideoFill className='action-icon' />
                 </div>
               : 
-                <div onClick={stopVideo} className='action-icon-container danger'>
+                <div onClick={toggleVideo} className='action-icon-container danger'>
                   <BsCameraVideoOffFill className='action-icon ' />
                 </div>
               }
