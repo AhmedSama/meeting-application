@@ -7,8 +7,8 @@ import { Join } from "./pages/Join";
 import { Joiner } from "./pages/Joiner";
 import toast, { Toaster } from 'react-hot-toast';
 
-export const url = "http://localhost:3001"
-// export const url = "https://ancient-caverns-06365.herokuapp.com/" 
+// export const url = "http://localhost:3001"
+export const url = "https://ancient-caverns-06365.herokuapp.com/" 
 
 export const context = createContext()
 
