@@ -79,9 +79,10 @@ export const Joiner = ({toast}) => {
       call(pID)
     }
   } 
-  const call = (peerID) => {
+  const call = async(peerID) => {
     console.log(peerID)
     try{
+      streamRef.current = await navigator.mediaDevices.getUserMedia({audio:true})
       const c = peerRef.current.call(peerID,streamRef.current)
       c.on('stream', function(remoteStream) {
         const video = document.createElement("video")
@@ -93,15 +94,10 @@ export const Joiner = ({toast}) => {
         console.log(error)
     }
   }
-  useEffect(()=>{
-    const run = async () => {
-      streamRef.current = await navigator.mediaDevices.getUserMedia({audio:true})
-    }
-    run()
-  },[])
+
   useEffect(()=>{
     peerRef.current.on('call', async function(call) {
-      console.log("answering")
+      streamRef.current = await navigator.mediaDevices.getUserMedia({audio:true})
       call.answer(streamRef.current)
       call.on('stream', function(remoteStream) {
           const videoTracks = getVideoTracks(remoteStream)
@@ -118,7 +114,7 @@ export const Joiner = ({toast}) => {
           }
         })
     })
-  },[streamRef])
+  },[])
   useEffect(()=>{
     socket.on("msg", data => {
       if(data.name !== name){
@@ -196,7 +192,7 @@ export const Joiner = ({toast}) => {
       <div className='right'>
         <div className='section-top flex-center'>
           <div className='video-container'>
-            <video autoPlay ref={videoRef} muted></video>
+            <video autoPlay ref={videoRef}></video>
           </div>
         </div>
         <div className='section-bottom flex-center'>
