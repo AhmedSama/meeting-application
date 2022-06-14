@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { context } from '../App'
 import { Peer } from "peerjs"
 import {FiShare} from 'react-icons/fi'
-import {BsCameraVideoFill, BsCameraVideoOffFill, BsFillChatSquareTextFill, BsMicFill} from 'react-icons/bs'
+import {BsCameraVideoFill, BsCameraVideoOffFill, BsFillChatSquareTextFill, BsList, BsMicFill,BsMicMuteFill} from 'react-icons/bs'
 import { User } from '../components/User'
 import { Chat } from '../components/Chat'
 import {FaUsers} from 'react-icons/fa'
+import { CgClose } from "react-icons/cg"
 import msgAudioSrc from "../sounds/msg.mp3"
 
 export const Creator = ({toast}) => {
@@ -53,6 +54,9 @@ export const Creator = ({toast}) => {
     const getIt = async() => {
       audioStreamRef.current = await getAudioStream()
       captureStreamRef.current = await getVideoStream()
+      if(captureStreamRef.current == null){
+        navigate("/")
+      }
       captureStreamRef.current.getVideoTracks()[0].enabled = false
     }
     getIt()
@@ -62,8 +66,6 @@ export const Creator = ({toast}) => {
   useEffect(()=>{
     socket.on("msg", data => {
       if(data.name !== name){
-        // msgSound.currentTime = 0
-        // msgSound.play()
         toast(data.name + " just sent a message: \n" + data.msg,{duration: 7000,
           position: 'bottom-right',icon: '📩',style: {
             borderRadius: '10px',
@@ -109,13 +111,7 @@ export const Creator = ({toast}) => {
       captureStreamRef.current?.getAudioTracks()[0]?.stop()
   }
   const call = (peerID) => {
-    // const c = peerRef.current.call(peerID,new MediaStream())
-    // peerConnectionsRef.current.push(c.peerConnection)
-    // c.on('stream', function(remoteStream) {
-    //   const video = document.createElement("video")
-    //   video.srcObject = remoteStream
-    //   video.play()
-    // })
+
     if(captureStreamRef.current === null){
       const c = peerRef.current.call(peerID,audioStreamRef.current)
       peerConnectionsRef.current.push(c.peerConnection)
@@ -136,22 +132,11 @@ export const Creator = ({toast}) => {
       })
     }
   }
-  const captureNewStream = async() =>{
-    try {
-      captureStreamRef.current = await navigator.mediaDevices.getDisplayMedia({
-        video: true
-      });
-      videoRef.current.srcObject = captureStreamRef.current
-    } catch(err) {
-      console.error("Error: " + err);
-    }
-  }
+
   const changeCurrentStream = async() =>{
-    // .peerConnection.getSenders()[0].replaceTrack(newTrack)
 
       const newStream = await navigator.mediaDevices.getDisplayMedia({
         video: { width: 1280 * 5, height: 720 * 5 }
-        // video : true
       })
       videoRef.current.srcObject = newStream
       stopStream()
@@ -199,16 +184,19 @@ export const Creator = ({toast}) => {
       setPlayMsgSound(false)
     }
   }
-
+  const handleToggleSideBar = () => {
+    document.getElementById("meet-container").classList.toggle("active")
+  }
   return (
-    <div className='meet-container'>
+    <div className='meet-container' id='meet-container'>
       <div className='left'>
+          <CgClose onClick={handleToggleSideBar} className={'close-sidebar '} />
           <div className='section-top flex-column'>
             {
               sidebar ?
-              <h1 className='title border-bottom'>all users</h1>
+              <h1  className='title border-bottom'>All users</h1>
               :
-              <h1 className='title border-bottom'>chat messages</h1>
+              <h1  className='title border-bottom'>Chat</h1>
             }
             {sidebar ?
               users.map(user=>{
@@ -235,6 +223,7 @@ export const Creator = ({toast}) => {
 
       </div>
       <div className='right'>
+        <BsList className='toggle-sidebar' onClick={handleToggleSideBar}/>
         <div className='section-top flex-center'>
           <div className='video-container'>
             <video autoPlay ref={videoRef} muted></video>

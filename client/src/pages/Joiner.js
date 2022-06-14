@@ -2,11 +2,13 @@ import {Peer} from 'peerjs'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { context } from '../App'
-import {BsCameraVideoFill, BsFillChatSquareTextFill, BsMicFill} from 'react-icons/bs'
+import {BsCameraVideoFill, BsFillChatSquareTextFill, BsList, BsMicFill} from 'react-icons/bs'
 import { User } from '../components/User'
 import { Chat } from '../components/Chat'
 import { FaUsers } from 'react-icons/fa'
 import msgAudioSrc from "../sounds/msg.mp3"
+import { CgClose } from "react-icons/cg"
+
 
 export const Joiner = ({toast}) => {
   const navigate = useNavigate()
@@ -19,14 +21,8 @@ export const Joiner = ({toast}) => {
   const streamRef = useRef(null)
   const videoRef = useRef()
   const [playMsgSound,setPlayMsgSound] = useState(false)
-  const [peerConnection,setPeerConnection] = useState(null)
   let msgSound =  new Audio(msgAudioSrc) 
-  // useEffect(()=>{
-  //   if(sidebar && circleNotify){
-  //     msgSound.currentTime = 0
-  //     msgSound.play()
-  //   }
-  // },[circleNotify,sidebar])
+
   useEffect(()=>{
     if(!roomID){
       navigate("/")
@@ -120,7 +116,7 @@ export const Joiner = ({toast}) => {
       if(data.name !== name){
         // msgSound.currentTime = 0
         // msgSound.play()
-        toast(data.name + " just sent a message: \n" + data.msg,{duration: 7000,
+        toast(data.name + " sent a message: \n" + data.msg,{duration: 7000,
           position: 'bottom-right',icon: '📩',style: {
             borderRadius: '10px',
             background: '#333',
@@ -155,9 +151,13 @@ export const Joiner = ({toast}) => {
       setPlayMsgSound(false)
     }
   }
+  const handleToggleSideBar = () => {
+    document.getElementById("meet-container").classList.toggle("active")
+  }
   return (
-    <div className='meet-container'>
+    <div className='meet-container' id='meet-container'>
       <div className='left'>
+      <CgClose onClick={handleToggleSideBar} className={'close-sidebar '} />
         <div className='section-top flex-column'>
             {
               sidebar ?
@@ -190,6 +190,7 @@ export const Joiner = ({toast}) => {
           </div>
         </div>
       <div className='right'>
+      <BsList className='toggle-sidebar' onClick={handleToggleSideBar}/>
         <div className='section-top flex-center'>
           <div className='video-container'>
             <video autoPlay ref={videoRef}></video>

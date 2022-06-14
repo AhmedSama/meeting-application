@@ -113,7 +113,54 @@ input::placeholder{
   background-color: #282828;
   display: flex;
 }
-
+.toggle-sidebar{
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 35px;
+  color: white;
+  cursor: pointer;
+  z-index: 10;
+}
+.close-sidebar{
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 25px;
+  color: var(--color);
+  background-color: #f0f0f0;
+  padding: 5px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: none;
+  z-index: 10;
+}
+.close-sidebar:hover{
+  background-color: #dedede;
+}
+.left{
+  overflow: hidden;
+  width: 20%;
+  height: 100%;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.right{
+  overflow: hidden;
+  width: 80%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.meet-container.active .left{
+  width: 0;
+}
+.meet-container.active .right{
+  width: 100%;
+}
 .video-container{
   --ratio : 1.2;
   width: calc(852px * var(--ratio)) ;
@@ -128,20 +175,7 @@ input::placeholder{
   height: 100%;
   object-fit: contain;
 }
-.left{
-  overflow: hidden;
-  width: 20%;
-  height: 100%;
-  background-color: white;
-  display: flex;
-  flex-direction: column;
-}
-.right{
-  width: 80%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
+
 .flex-center{
   display: flex;
   align-items: center;
@@ -320,35 +354,54 @@ input::placeholder{
   }
 }
 @media ( max-width: 1000px){
+  .close-sidebar{
+    display: block;
+  }
   .left{
-    width: 30%;
+    width: 0;
   }
   .right{
-    width : 70%
+    width : 100%
   }
-}
-@media ( max-width: 900px){
-  .left{
-    width: 35%;
+  .meet-container.active .left{
+    width: 70%;
   }
-  .right{
-    width : 65%
+  .meet-container.active .right{
+    width: 0;
   }
-  .actions{
-    width: 50%;
-  }
-  
 }
 
-@media ( max-width: 800px ){
+
+@media ( max-width: 900px ){
   .left{
     width: 0%;
   }
   .right{
     width : 100%
   }
+  .meet-container.active .left{
+    width: 100%;
+  }
+  .meet-container.active .right{
+    width: 0;
+  }
   .actions{
     width: 50%;
+  }
+  .title{
+    font-size: 25px;
+  }
+  .small{
+    font-size:20px ;
+  }
+  .form{
+    padding: 1rem 1rem;
+    border:none;
+    width: 95%;
+    background-color: #f3f6f8;
+  }
+  .close-sidebar{
+    display: block;
   }
 
 }
