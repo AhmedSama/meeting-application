@@ -6,9 +6,11 @@ import {FiShare} from 'react-icons/fi'
 import {BsCameraVideoFill, BsCameraVideoOffFill, BsFillChatSquareTextFill, BsList, BsMicFill,BsMicMuteFill} from 'react-icons/bs'
 import { User } from '../components/User'
 import { Chat } from '../components/Chat'
-import {FaUsers} from 'react-icons/fa'
+import {FaLink, FaUsers} from 'react-icons/fa'
+import { MdCallEnd, MdScreenShare, MdStopScreenShare } from "react-icons/md"
 import { CgClose } from "react-icons/cg"
 import msgAudioSrc from "../sounds/msg.mp3"
+import { LinkModal } from '../components/LinkModal'
 
 export const Creator = ({toast}) => {
   const {socket,users,msgs,setMsgs,name} = useContext(context)
@@ -25,6 +27,8 @@ export const Creator = ({toast}) => {
   const [audioIcon,setAudioIcon] = useState(true)
   const [circleNotify,setCircleNotify] = useState(false)
   const [playMsgSound,setPlayMsgSound] = useState(false)
+  const [shared,setShared] = useState(false)
+  const [showModal,setShowModal] = useState(true)
   // sidebar => true for the users , false for the chat
   const [sidebar,setSideBar] = useState(true)
   let msgSound =  new Audio(msgAudioSrc) 
@@ -55,10 +59,8 @@ export const Creator = ({toast}) => {
     const getIt = async() => {
       audioStreamRef.current = await getAudioStream()
       captureStreamRef.current = await getVideoStream()
-      if(captureStreamRef.current == null){
-        navigate("/")
-      }
-      captureStreamRef.current.getVideoTracks()[0].enabled = false
+      if(captureStreamRef.current)
+        captureStreamRef.current.getVideoTracks()[0].enabled = false
     }
     getIt()
     
@@ -94,6 +96,7 @@ export const Creator = ({toast}) => {
     }
     catch(err){
       console.error("video stream denied")
+      navigate("/error")
       return null
     }
   }
@@ -104,6 +107,7 @@ export const Creator = ({toast}) => {
     }
     catch(err){
       console.error("audio stream denied")
+      navigate("/error")
       return null
     }
   }
@@ -135,10 +139,15 @@ export const Creator = ({toast}) => {
   }
 
   const changeCurrentStream = async() =>{
-
-      const newStream = await navigator.mediaDevices.getDisplayMedia({
-        video: { width: 1280 * 5, height: 720 * 5 }
-      })
+    let newStream = null;
+      try{
+        newStream = await navigator.mediaDevices.getDisplayMedia({
+          video: { width: 1280 * 5, height: 720 * 5 }
+        })
+      }catch(error){
+        return
+      }
+      setShared(true)
       videoRef.current.srcObject = newStream
       stopStream()
       captureStreamRef.current = newStream
@@ -159,12 +168,7 @@ export const Creator = ({toast}) => {
 
   }
   const share = async() => {
-    // if(captureStreamRef.current === null && audioStreamRef.current == null){
-    //   captureNewStream()
-    // }
-    // else{
       changeCurrentStream()
-    // }
   }
   const toggleVideo = () => {
     captureStreamRef.current.getVideoTracks()[0].enabled = captureStreamRef.current.getVideoTracks()[0].enabled ? false : true
@@ -193,6 +197,7 @@ export const Creator = ({toast}) => {
     document.getElementById("meet-container").classList.toggle("active")
   }
   return (
+    <>
     <div className='meet-container' id='meet-container'>
       <div className='left'>
           <CgClose onClick={handleToggleSideBar} className={'close-sidebar '} />
@@ -236,6 +241,12 @@ export const Creator = ({toast}) => {
         </div>
         <div className='section-bottom flex-center'>
           <div className='actions'>
+            <div className='action-icon-container danger'>
+              <MdCallEnd className='action-icon'/>
+            </div>
+            <div onClick={share} className='action-icon-container'>
+              <FiShare className='action-icon'/>
+            </div>
             {
               audioIcon ?
             <div onClick={toggleAudio} className='action-icon-container'>
@@ -246,22 +257,26 @@ export const Creator = ({toast}) => {
               <BsMicMuteFill className='action-icon' />
             </div>
             }
-            <div onClick={share} className='action-icon-container'>
-              <FiShare className='action-icon'/>
+            
+            {
+              videoIcon ?
+              shared && <div onClick={toggleVideo} className='action-icon-container'>
+                <MdScreenShare className='action-icon' />
+              </div>
+            : 
+            shared && <div onClick={toggleVideo} className='action-icon-container danger'>
+                <MdStopScreenShare className='action-icon' />
+              </div>
+            }
+            <div onClick={()=>setShowModal(!showModal)} className='action-icon-container'>
+              <FaLink className='action-icon' />
             </div>
-              {videoIcon ?
-                <div onClick={toggleVideo} className='action-icon-container'>
-                  <BsCameraVideoFill className='action-icon' />
-                </div>
-              : 
-                <div onClick={toggleVideo} className='action-icon-container danger'>
-                  <BsCameraVideoOffFill className='action-icon ' />
-                </div>
-              }
           </div>
         </div>
       </div>
 
     </div>
+    {showModal && <LinkModal toast={toast} show={showModal} setShow={setShowModal} />}
+    </>
   )
 }

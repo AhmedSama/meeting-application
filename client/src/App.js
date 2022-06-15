@@ -6,9 +6,11 @@ import { Creator } from "./pages/Creator";
 import { Join } from "./pages/Join";
 import { Joiner } from "./pages/Joiner";
 import toast, { Toaster } from 'react-hot-toast';
+import { LinkJoin } from "./pages/LinkJoin";
+import { ErrorPage } from "./pages/ErrorPage";
 
-// export const url = "http://localhost:3001"
-export const url = "https://ancient-caverns-06365.herokuapp.com/" 
+export const url = "http://localhost:3001"
+// export const url = "https://ancient-caverns-06365.herokuapp.com/" 
 
 export const context = createContext()
 
@@ -43,14 +45,7 @@ function App() {
       })
     })
   },[])
-  const hasTheSameName = (theName) => {
-    if(msgs){
-      const lastMsg = msgs[msgs.length - 1]
-      const lastMsgName = lastMsg.name
-      return theName === lastMsgName
-    }
-    return false
-  }
+
   
   return (
     <>
@@ -61,6 +56,8 @@ function App() {
             <Route path="/:id" element={<Creator toast={toast}/>}/>
             <Route path="/join" element={<Join/>}/>
             <Route path="/join/:id" element={<Joiner toast={toast}/>}/>
+            <Route path="/link/:roomID" element={<LinkJoin/>}/>
+            <Route path="/error" element={<ErrorPage/>}/>
           </Routes>
         </BrowserRouter>
       </context.Provider>

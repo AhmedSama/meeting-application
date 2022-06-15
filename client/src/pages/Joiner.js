@@ -8,6 +8,8 @@ import { Chat } from '../components/Chat'
 import { FaUsers } from 'react-icons/fa'
 import msgAudioSrc from "../sounds/msg.mp3"
 import { CgClose } from "react-icons/cg"
+import { IoHandRightSharp } from 'react-icons/io5'
+import { MdCallEnd } from 'react-icons/md'
 
 
 export const Joiner = ({toast}) => {
@@ -94,7 +96,12 @@ export const Joiner = ({toast}) => {
 
   useEffect(()=>{
     peerRef.current.on('call', async function(call) {
-      streamRef.current = await navigator.mediaDevices.getUserMedia({audio:true})
+      try{
+        streamRef.current = await navigator.mediaDevices.getUserMedia({audio:true})
+      }catch(error){
+        navigate("/error")
+        return
+      }
       call.answer(streamRef.current)
       call.on('stream', function(remoteStream) {
           const videoTracks = getVideoTracks(remoteStream)
@@ -115,8 +122,6 @@ export const Joiner = ({toast}) => {
   useEffect(()=>{
     socket.on("msg", data => {
       if(data.name !== name){
-        // msgSound.currentTime = 0
-        // msgSound.play()
         toast(data.name + " sent a message: \n" + data.msg,{duration: 7000,
           position: 'bottom-right',icon: '📩',style: {
             borderRadius: '10px',
@@ -204,6 +209,9 @@ export const Joiner = ({toast}) => {
         </div>
         <div className='section-bottom flex-center'>
           <div className='actions'>
+            <div className='action-icon-container danger'>
+              <MdCallEnd className='action-icon'/>
+            </div>
           {
             audioIcon ?
             <div onClick={toggleAudio} className='action-icon-container'>
@@ -215,7 +223,7 @@ export const Joiner = ({toast}) => {
             </div>
             }
             <div className='action-icon-container'>
-              <BsCameraVideoFill className='action-icon' />
+              <IoHandRightSharp className='action-icon' />
             </div>
           </div>
         </div>
