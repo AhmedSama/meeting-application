@@ -47,7 +47,7 @@ io.on('connection', (socket) => {
         let connectedUsersData;
         io.in(roomID).fetchSockets().then(sockets=>{
           connectedUsersData = sockets.map(s=>{
-            return {name : s.name,role:s.role,id:Math.random()}
+            return {name : s.name,role:s.role,id:Math.random(),status : null, handsUp : false}
           })
           socket.emit("users-data",{users : connectedUsersData})
         })
@@ -71,6 +71,9 @@ io.on('connection', (socket) => {
   })
   socket.on("call-end",data=>{
     socket.to(socket.roomID).emit("call-end",data)
+  })
+  socket.on("raise-hand",data=>{
+    socket.to(socket.roomID).emit("raise-hand",data)
   })
   socket.on("disconnect",()=>{
       console.log(socket.id + " disconnected")

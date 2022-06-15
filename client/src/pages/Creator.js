@@ -13,7 +13,7 @@ import msgAudioSrc from "../sounds/msg.mp3"
 import { LinkModal } from '../components/LinkModal'
 
 export const Creator = ({toast}) => {
-  const {socket,users,msgs,setMsgs,name} = useContext(context)
+  const {socket,users,setUsers,msgs,setMsgs,name} = useContext(context)
   const videoRef = useRef()
   const captureStreamRef = useRef(null)
   const audioStreamRef = useRef(null)
@@ -106,6 +106,30 @@ export const Creator = ({toast}) => {
       socket.off("msg")
     }
   },[name])
+  useEffect(()=>{
+    socket.on("raise-hand",data=>{
+      setUsers(prevUsers => {
+        return prevUsers.map(u=>{
+          if(u.name === data.name){
+            if(data.handsUp){
+              toast(data.name + " raised hand",{duration: 7000,
+                position: 'bottom-right',icon: '✋🏻',style: {
+                  borderRadius: '10px',
+                  background: '#333',
+                  color: '#fff',
+                }})
+                msgSound.currentTime = 0
+                msgSound.play()
+            }
+            return {...u,handsUp : data.handsUp}
+          }
+          else{
+            return u
+          }
+        })
+      })
+    })
+  },[])
   const getVideoStream = async() => {
     try{
         const videoStream = await navigator.mediaDevices.getUserMedia({video:{ width: 1280 * 5, height: 720 * 5}})
@@ -227,7 +251,7 @@ export const Creator = ({toast}) => {
             }
             {sidebar ?
               users.map(user=>{
-                return <User key={user.id} name={user.name} role={user.role}  />
+                return <User key={user.id} name={user.name} role={user.role} status={user.status} handsUp={user.handsUp}  />
               }) :
               <Chat msgs={msgs} />
             }

@@ -251,8 +251,23 @@ input::placeholder{
 .user{
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 10px;
   margin: 20px 10px;
+}
+.hand-shake{
+  color: #656565;
+  animation: shake 0.5s ease-in-out infinite;
+}
+@keyframes shake{
+  0%{
+    transform: rotateZ(20deg);
+  }
+  50%{
+    transform: rotateZ(-20deg);
+  }
+  100%{
+    transform: rotateZ(20deg);
+  }
 }
 .first-letter{
   width: 35px;

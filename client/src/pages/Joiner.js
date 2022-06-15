@@ -14,7 +14,7 @@ import { MdCallEnd } from 'react-icons/md'
 
 export const Joiner = ({toast}) => {
   const navigate = useNavigate()
-  const {socket,roomID,users,msgs,setMsgs,name} = useContext(context)
+  const {socket,roomID,users,setUsers,msgs,setMsgs,name} = useContext(context)
   // sidebar => true for the users , false for the chat
   const [sidebar,setSideBar] = useState(true)
   const [circleNotify,setCircleNotify] = useState(false)
@@ -41,15 +41,7 @@ export const Joiner = ({toast}) => {
     })
   },[])
 
-  const getAudioTracks = (stream) => {
-    // return stream.getTracks().find(track=>track.kind === "audio")
-    try{
-      return stream.getAudioTracks()
-    }
-    catch(err){
-      return null
-    }
-  }
+
   const getVideoTracks = (stream) => {
     // return stream.getTracks().find(track=>track.kind === "video")
     try{
@@ -161,7 +153,30 @@ export const Joiner = ({toast}) => {
       socket.off("msg")
     }
   },[name])
-
+  useEffect(()=>{
+    socket.on("raise-hand",data=>{
+      setUsers(prevUsers => {
+        return prevUsers.map(u=>{
+          if(u.name === data.name){
+            if(data.handsUp){
+              toast(data.name + " raised hand",{duration: 7000,
+                position: 'bottom-right',icon: '✋🏻',style: {
+                  borderRadius: '10px',
+                  background: '#333',
+                  color: '#fff',
+                }})
+                msgSound.currentTime = 0
+                msgSound.play()
+            }
+            return {...u,handsUp : data.handsUp}
+          }
+          else{
+            return u
+          }
+        })
+      })
+    })
+  },[])
   const toggleAudio  = () => {
     streamRef.current.getAudioTracks()[0].enabled = streamRef.current.getAudioTracks()[0].enabled ? false : true
     setAudioIcon(streamRef.current.getAudioTracks()[0].enabled)
@@ -184,6 +199,19 @@ export const Joiner = ({toast}) => {
   const handleToggleSideBar = () => {
     document.getElementById("meet-container").classList.toggle("active")
   }
+  const raiseHand = () => {
+    setUsers(prevUsers => {
+      return prevUsers.map(u=>{
+        if(u.name === name){
+          socket.emit("raise-hand",{name:name,handsUp :!u.handsUp })
+          return {...u,handsUp : !u.handsUp}
+        }
+        else{
+          return u
+        }
+      })
+    })
+  }
   return (
     <div className='meet-container' id='meet-container'>
       <div className='left'>
@@ -197,7 +225,7 @@ export const Joiner = ({toast}) => {
             }
             {sidebar ?
               users.map(user=>{
-                return <User key={user.id} name={user.name} role={user.role}  />
+                return <User key={user.id} name={user.name} role={user.role}  status={user.status} handsUp={user.handsUp}    />
               }) :
               <Chat msgs={msgs} />
             
@@ -241,7 +269,7 @@ export const Joiner = ({toast}) => {
               <BsMicMuteFill className='action-icon' />
             </div>
             }
-            <div className='action-icon-container'>
+            <div onClick={raiseHand} className='action-icon-container'>
               <IoHandRightSharp className='action-icon' />
             </div>
           </div>

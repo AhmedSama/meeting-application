@@ -31,7 +31,8 @@ function App() {
         position: 'top-right',icon: '😃'})
       setUsers(prevUsers=>{
         // role 0 host , role 1 normal
-        return [...prevUsers,{name : data.name, id : Math.random(),role:1}]
+
+        return [...prevUsers,{name : data.name, id : Math.random(),role:1,status : null, handsUp : false}]
       })
       
     })
