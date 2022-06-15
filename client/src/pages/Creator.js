@@ -46,6 +46,23 @@ export const Creator = ({toast}) => {
       msgSound.play()
     }
   },[playMsgSound])
+  useEffect(()=>{
+    peerRef.current.on("close",()=>{
+      socket.emit("call-end",{end : true})
+      captureStreamRef.current.getTracks().forEach(function(track) {
+        track.stop();
+      })
+      audioStreamRef.current.getTracks().forEach(function(track) {
+        track.stop();
+      })
+      socket.disconnect()
+      window.location.href = "/"
+    })
+  },[])
+
+  const closeCall = () => {
+    peerRef.current.destroy()
+  }
 
   useEffect(()=>{
     socket.on("recv-peerID",data=>{
@@ -241,7 +258,7 @@ export const Creator = ({toast}) => {
         </div>
         <div className='section-bottom flex-center'>
           <div className='actions'>
-            <div className='action-icon-container danger'>
+            <div onClick={closeCall} className='action-icon-container danger'>
               <MdCallEnd className='action-icon'/>
             </div>
             <div onClick={share} className='action-icon-container'>

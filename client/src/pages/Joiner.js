@@ -93,7 +93,26 @@ export const Joiner = ({toast}) => {
         console.log(error)
     }
   }
+  useEffect(()=>{
+    socket.on("call-end",data=>{
+      peerRef.current.destroy()
 
+      streamRef.current.getTracks().forEach(function(track) {
+        track.stop();
+      })
+      socket.disconnect()
+      window.location.href = "/"
+    })
+  },[])
+  const closeCall = () => {
+    peerRef.current.destroy()
+
+      streamRef.current.getTracks().forEach(function(track) {
+        track.stop();
+      })
+      socket.disconnect()
+      window.location.href = "/"
+  }
   useEffect(()=>{
     peerRef.current.on('call', async function(call) {
       try{
@@ -209,7 +228,7 @@ export const Joiner = ({toast}) => {
         </div>
         <div className='section-bottom flex-center'>
           <div className='actions'>
-            <div className='action-icon-container danger'>
+            <div onClick={closeCall} className='action-icon-container danger'>
               <MdCallEnd className='action-icon'/>
             </div>
           {

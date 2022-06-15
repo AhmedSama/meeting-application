@@ -440,13 +440,18 @@ input::placeholder{
   .form{
     padding: 1rem 1rem;
     border:none;
-    width: 95%;
+    width: 70%;
     background-color: #f3f6f8;
   }
   .close-sidebar{
     display: block;
   }
 
+}
+@media (max-width : 600px){
+  .form{
+    width: 90%;
+  }
 }
 @media (max-width : 450px){
   .invite-container{
@@ -456,6 +461,7 @@ input::placeholder{
     left: 50%;
     transform: translate(-50%,-50%);
   }
+  
 }
 @media (max-width: 400px){
   .actions {
