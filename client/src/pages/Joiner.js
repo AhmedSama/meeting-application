@@ -199,7 +199,8 @@ export const Joiner = ({toast}) => {
   const handleToggleSideBar = () => {
     document.getElementById("meet-container").classList.toggle("active")
   }
-  const raiseHand = () => {
+  const raiseHand = (e) => {
+    e.currentTarget.classList.toggle("active")
     setUsers(prevUsers => {
       return prevUsers.map(u=>{
         if(u.name === name){

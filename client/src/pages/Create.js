@@ -14,7 +14,7 @@ export const Create = () => {
         // localStorage.setItem("roomID",data.roomID)
         setName(data.name)
         setUsers(prevUsers=>{
-          return [...prevUsers,{name:data.name,id : Math.random(),role:0,status : null, handsUp : false}]
+          return [...prevUsers,{name:data.name,id : Math.random(),role:0,status : "😍", handsUp : false}]
         })
         setRoomID(data.roomID)
         navigate(`/${data.roomID}`)
