@@ -41,6 +41,8 @@ export const Create = () => {
             </button>
           </div>
           <p className="small"><Link className="link" to={"/join"}>join</Link> a meet</p>
+          <p className="small"> Developed by <a href="https://www.linkedin.com/in/ahmed-ghazi-samari
+" >Ahmed Ghazi</a> with ❤</p>
         </div>
   )
 }
