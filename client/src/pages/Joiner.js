@@ -100,9 +100,12 @@ export const Joiner = ({toast}) => {
   const closeCall = () => {
     peerRef.current.destroy()
 
-      streamRef.current.getTracks().forEach(function(track) {
-        track.stop();
-      })
+      const tracks = streamRef.current.getTracks();
+      if(tracks.length > 0){
+        tracks.forEach(function(track) {
+          track.stop();
+        })
+      }
       socket.disconnect()
       window.location.href = "/"
   }
