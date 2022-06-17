@@ -34,6 +34,8 @@ a{
 }
 .title{
   text-align: center;
+  font-size: 27px;
+  color: var(--color);
   font-weight: 400;
 }
 .border-bottom{
@@ -504,6 +506,7 @@ input::placeholder{
   }
   .title{
     font-size: 25px;
+    color: var(--color);
   }
   .small{
     font-size:20px ;
