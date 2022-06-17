@@ -7,7 +7,8 @@ import { context } from '../App';
 export const LinkModal = ({toast,show,setShow}) => {
     const notify = () => toast.success('copyed to clipboard')
     const roomIDRef = useRef()
-    const url = "http://localhost:3000"
+    // const url = "http://localhost:3000"
+    const url = window.location.href
     // production server url
     const linkRef = useRef()
     const {roomID} = useContext(context)
