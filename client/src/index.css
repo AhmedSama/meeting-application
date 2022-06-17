@@ -526,6 +526,9 @@ input::placeholder{
   .form{
     width: 90%;
   }
+  #share-icon{
+    display: none;
+  }
 }
 @media (max-width : 450px){
   .invite-container{
@@ -541,6 +544,7 @@ input::placeholder{
   .actions {
       width: 90%;
   }
+  
 }
 
 

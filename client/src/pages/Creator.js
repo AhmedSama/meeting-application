@@ -292,7 +292,7 @@ export const Creator = ({toast}) => {
             <div onClick={closeCall} className='action-icon-container danger'>
               <MdCallEnd className='action-icon'/>
             </div>
-            <div onClick={share} className='action-icon-container'>
+            <div id='share-icon' onClick={share} className='action-icon-container'>
               <FiShare className='action-icon'/>
             </div>
             {
