@@ -24,6 +24,7 @@ export const Joiner = ({toast}) => {
   const [audioIcon,setAudioIcon] = useState(true)
   const videoRef = useRef()
   const [playMsgSound,setPlayMsgSound] = useState(false)
+  const [hostScreenIsSharing,setHostScreenIsSharing] = useState(false)
   let msgSound =  new Audio(msgAudioSrc) 
 
   useEffect(()=>{
@@ -119,6 +120,7 @@ export const Joiner = ({toast}) => {
           // const audioTracks = getAudioTracks(remoteStream)
 
           if(videoTracks.length > 0){
+            setHostScreenIsSharing(videoTracks[0].enabled)
             videoRef.current.srcObject = remoteStream
           }
           else{
@@ -213,6 +215,11 @@ export const Joiner = ({toast}) => {
       })
     })
   }
+  useEffect(()=>{
+    socket.on("shared-screen",data=>{
+      setHostScreenIsSharing(data.screenIsSharing)
+    })
+  },[])
   return (
     <div className='meet-container' id='meet-container'>
       <div className='left'>
@@ -252,7 +259,12 @@ export const Joiner = ({toast}) => {
       <BsList className='toggle-sidebar' onClick={handleToggleSideBar}/>
         <div className='section-top flex-center'>
           <div className='video-container'>
-            <video autoPlay ref={videoRef}></video>
+            <video style={{display : hostScreenIsSharing ? "block" : "none"}} autoPlay ref={videoRef}></video>
+            {
+              !hostScreenIsSharing &&
+              <div className='first-letter big'>{name[0]}</div>
+            }
+
           </div>
         </div>
         <div className='section-bottom flex-center'>

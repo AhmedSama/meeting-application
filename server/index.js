@@ -80,9 +80,8 @@ io.on('connection', (socket) => {
     socket.handsUp = !socket.handsUp
     socket.to(socket.roomID).emit("raise-hand",data)
   })
-  socket.on("set-status",data=>{
-    socket.status = data.emoji
-    socket.to(socket.roomID).emit("set-status",data)
+  socket.on("shared-screen",data=>{
+    socket.to(socket.roomID).emit("shared-screen",data)
   })
   socket.on("disconnect",()=>{
       console.log(socket.id + " disconnected")

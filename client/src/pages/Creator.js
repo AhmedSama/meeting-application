@@ -29,6 +29,8 @@ export const Creator = ({toast}) => {
   const [playMsgSound,setPlayMsgSound] = useState(false)
   const [shared,setShared] = useState(false)
   const [showModal,setShowModal] = useState(true)
+
+
   // sidebar => true for the users , false for the chat
   const [sidebar,setSideBar] = useState(true)
   let msgSound =  new Audio(msgAudioSrc) 
@@ -213,6 +215,7 @@ export const Creator = ({toast}) => {
   }
   const toggleVideo = () => {
     captureStreamRef.current.getVideoTracks()[0].enabled = captureStreamRef.current.getVideoTracks()[0].enabled ? false : true
+    socket.emit("shared-screen",{screenIsSharing : captureStreamRef.current.getVideoTracks()[0].enabled})
     setVideoIcon(captureStreamRef.current.getVideoTracks()[0].enabled)
   }
   const toggleAudio  = () => {
@@ -277,7 +280,11 @@ export const Creator = ({toast}) => {
         <BsList className='toggle-sidebar' onClick={handleToggleSideBar}/>
         <div className='section-top flex-center'>
           <div className='video-container'>
-            <video autoPlay ref={videoRef} muted></video>
+            <video style={{display : shared ? "block" : "none"}} autoPlay ref={videoRef} muted></video>
+            {
+              !shared &&
+              <div className='first-letter big'>{name[0]}</div>
+            }
           </div>
         </div>
         <div className='section-bottom flex-center'>
