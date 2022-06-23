@@ -9,8 +9,8 @@ import toast, { Toaster } from 'react-hot-toast';
 import { LinkJoin } from "./pages/LinkJoin";
 import { ErrorPage } from "./pages/ErrorPage";
 
-// export const url = "http://localhost:3001"
-export const url = "https://ancient-caverns-06365.herokuapp.com/" 
+export const url = "http://localhost:3001"
+// export const url = "https://ancient-caverns-06365.herokuapp.com/" 
 
 export const context = createContext()
 

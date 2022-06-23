@@ -2,7 +2,7 @@ import {Peer} from 'peerjs'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { context } from '../App'
-import {BsCameraVideoFill, BsFillChatSquareTextFill, BsList, BsMicFill, BsMicMuteFill} from 'react-icons/bs'
+import { BsFillChatSquareTextFill, BsList, BsMicFill, BsMicMuteFill} from 'react-icons/bs'
 import { User } from '../components/User'
 import { Chat } from '../components/Chat'
 import { FaUsers } from 'react-icons/fa'
@@ -10,6 +10,7 @@ import msgAudioSrc from "../sounds/msg.mp3"
 import { CgClose } from "react-icons/cg"
 import { IoHandRightSharp } from 'react-icons/io5'
 import { MdCallEnd } from 'react-icons/md'
+import { silence } from '../utility'
 
 
 export const Joiner = ({toast}) => {
@@ -18,10 +19,10 @@ export const Joiner = ({toast}) => {
   // sidebar => true for the users , false for the chat
   const [sidebar,setSideBar] = useState(true)
   const [circleNotify,setCircleNotify] = useState(false)
-  const peerRef = useRef(new Peer)
+  const peerRef = useRef(new Peer())
   const peerIDRef = useRef(null)
   const streamRef = useRef(null)
-  const [audioIcon,setAudioIcon] = useState(true)
+  const [audioIcon,setAudioIcon] = useState(false)
   const videoRef = useRef()
   const [playMsgSound,setPlayMsgSound] = useState(false)
   const [hostScreenIsSharing,setHostScreenIsSharing] = useState(false)
@@ -72,19 +73,19 @@ export const Joiner = ({toast}) => {
     }
   } 
   const call = async(peerID) => {
-    console.log(peerID)
     try{
       streamRef.current = await navigator.mediaDevices.getUserMedia({audio:true})
-      const c = peerRef.current.call(peerID,streamRef.current)
+    }
+    catch(error){
+        streamRef.current = new MediaStream([silence()]) 
+        setAudioIcon(false)
+    }
+    const c = peerRef.current.call(peerID,streamRef.current)
       c.on('stream', function(remoteStream) {
         const video = document.createElement("video")
         video.srcObject = remoteStream
         video.play()
       })
-    }
-    catch(error){
-        console.log(error)
-    }
   }
   useEffect(()=>{
     socket.on("call-end",data=>{
@@ -98,30 +99,28 @@ export const Joiner = ({toast}) => {
     })
   },[])
   const closeCall = () => {
-    peerRef.current.destroy()
-
-      const tracks = streamRef.current.getTracks();
-      if(tracks.length > 0){
-        tracks.forEach(function(track) {
-          track.stop();
-        })
-      }
-      socket.disconnect()
-      window.location.href = "/"
+    peerRef.current?.destroy()
+    const tracks = streamRef.current.getTracks();
+    if(tracks.length > 0){
+      tracks.forEach(function(track) {
+        track.stop();
+      })
+    }
+    socket.disconnect()
+    window.location.href = "/"
   }
+
   useEffect(()=>{
     peerRef.current.on('call', async function(call) {
       try{
         streamRef.current = await navigator.mediaDevices.getUserMedia({audio:true})
+        setAudioIcon(true)
       }catch(error){
-        navigate("/error")
-        return
+        window.location.href = "/error"
       }
       call.answer(streamRef.current)
       call.on('stream', function(remoteStream) {
           const videoTracks = getVideoTracks(remoteStream)
-          // const audioTracks = getAudioTracks(remoteStream)
-
           if(videoTracks.length > 0){
             setHostScreenIsSharing(videoTracks[0].enabled)
             videoRef.current.srcObject = remoteStream
@@ -182,7 +181,9 @@ export const Joiner = ({toast}) => {
       })
     })
   },[])
-  const toggleAudio  = () => {
+
+
+  const toggleAudio  = async() => {
     streamRef.current.getAudioTracks()[0].enabled = streamRef.current.getAudioTracks()[0].enabled ? false : true
     setAudioIcon(streamRef.current.getAudioTracks()[0].enabled)
   }

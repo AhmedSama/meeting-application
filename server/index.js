@@ -83,6 +83,7 @@ io.on('connection', (socket) => {
   socket.on("shared-screen",data=>{
     socket.to(socket.roomID).emit("shared-screen",data)
   })
+
   socket.on("disconnect",()=>{
       console.log(socket.id + " disconnected")
       socket.to(socket.roomID).emit("leave-room",{name:socket.name})
