@@ -10,7 +10,7 @@ import msgAudioSrc from "../sounds/msg.mp3"
 import { CgClose } from "react-icons/cg"
 import { IoHandRightSharp } from 'react-icons/io5'
 import { MdCallEnd } from 'react-icons/md'
-import { silence } from '../utility'
+import { getAudioStream, silence } from '../utility'
 
 
 export const Joiner = ({toast}) => {
@@ -20,9 +20,11 @@ export const Joiner = ({toast}) => {
   const [sidebar,setSideBar] = useState(true)
   const [circleNotify,setCircleNotify] = useState(false)
   const peerRef = useRef(new Peer())
+  const peerConnectionsRef = useRef([])
   const peerIDRef = useRef(null)
   const streamRef = useRef(null)
   const [audioIcon,setAudioIcon] = useState(false)
+  const [audioStreamAllowed,setAudioStreamAllowed] = useState(false)
   const videoRef = useRef()
   const [playMsgSound,setPlayMsgSound] = useState(false)
   const [hostScreenIsSharing,setHostScreenIsSharing] = useState(false)
@@ -43,7 +45,12 @@ export const Joiner = ({toast}) => {
     })
   },[])
 
-
+  // useEffect(()=>{
+  //   // initiate the video stream and audio stream with dummy tracks
+  //   const audioTrack = silence()
+  //   streamRef.current = new MediaStream() 
+  //   streamRef.current.addTrack(audioTrack)
+  // },[])
   const getVideoTracks = (stream) => {
     // return stream.getTracks().find(track=>track.kind === "video")
     try{
@@ -73,19 +80,21 @@ export const Joiner = ({toast}) => {
     }
   } 
   const call = async(peerID) => {
-    try{
-      streamRef.current = await navigator.mediaDevices.getUserMedia({audio:true})
-    }
-    catch(error){
-        streamRef.current = new MediaStream([silence()]) 
-        setAudioIcon(false)
-    }
+    // try{
+    //   // if the audio is already allowed it is not gonna ask the user again
+    //   streamRef.current = await navigator.mediaDevices.getUserMedia({audio:true})
+    // }
+    // catch(error){
+    //     streamRef.current = new MediaStream([silence()]) 
+    //     setAudioIcon(false)
+    // }
     const c = peerRef.current.call(peerID,streamRef.current)
-      c.on('stream', function(remoteStream) {
-        const video = document.createElement("video")
-        video.srcObject = remoteStream
-        video.play()
-      })
+    peerConnectionsRef.current.push(c.peerConnection)
+    c.on('stream', function(remoteStream) {
+      const video = document.createElement("video")
+      video.srcObject = remoteStream
+      video.play()
+    })
   }
   useEffect(()=>{
     socket.on("call-end",data=>{
@@ -112,11 +121,15 @@ export const Joiner = ({toast}) => {
 
   useEffect(()=>{
     peerRef.current.on('call', async function(call) {
+      peerConnectionsRef.current.push(call.peerConnection)
       try{
         streamRef.current = await navigator.mediaDevices.getUserMedia({audio:true})
         setAudioIcon(true)
+        setAudioStreamAllowed(true)
       }catch(error){
-        window.location.href = "/error"
+        const audioTrack = silence()
+        streamRef.current = new MediaStream() 
+        streamRef.current.addTrack(audioTrack)
       }
       call.answer(streamRef.current)
       call.on('stream', function(remoteStream) {
@@ -182,10 +195,30 @@ export const Joiner = ({toast}) => {
     })
   },[])
 
-
+  const replaceTrack = (kind,track) => {
+    for(let peerConnection of peerConnectionsRef.current){
+      const sender = peerConnection.getSenders().find(s=>s.track.kind === kind)
+      if(sender){
+        sender.replaceTrack(track)
+      }
+    }
+  }
   const toggleAudio  = async() => {
-    streamRef.current.getAudioTracks()[0].enabled = streamRef.current.getAudioTracks()[0].enabled ? false : true
-    setAudioIcon(streamRef.current.getAudioTracks()[0].enabled)
+    if(audioStreamAllowed){
+      streamRef.current.getAudioTracks()[0].enabled = streamRef.current.getAudioTracks()[0].enabled ? false : true
+      setAudioIcon(streamRef.current.getAudioTracks()[0].enabled)
+    }
+    else{
+      const newAudioStream = await getAudioStream()
+      if(newAudioStream){
+        const audioTrack = newAudioStream.getAudioTracks()[0]
+        streamRef.current = newAudioStream
+        streamRef.current.getAudioTracks()[0].enabled = true
+        replaceTrack("audio",audioTrack)
+        setAudioStreamAllowed(true)
+        setAudioIcon(true)
+      }
+    }
   }
   const handleSideBar = (e) => {
     document.querySelectorAll(".action-icon-container.sidebar").forEach(element=>{
