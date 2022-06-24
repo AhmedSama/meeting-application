@@ -41,7 +41,7 @@ export const Create = () => {
             </button>
           </div>
           <p className="small"><Link className="link" to={"/join"}>join</Link> a meet</p>
-          <p className="small"> Developed with ❤ by <a href="https://www.linkedin.com/in/ahmed-ghazi-samari
+          <p className="small"> Developed with ❤ by <a rel="noreferrer" href="https://www.linkedin.com/in/ahmed-ghazi-samari
 " target="_blank">Ahmed Ghazi</a></p>
         </div>
   )

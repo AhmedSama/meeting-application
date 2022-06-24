@@ -61,7 +61,7 @@ export const Creator = ({toast}) => {
         track.stop();
       })
       socket.disconnect()
-      window.location.href = "/"
+      window.location.href = "/endcall"
     })
   },[])
 

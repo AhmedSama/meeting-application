@@ -7,10 +7,10 @@ import { Join } from "./pages/Join";
 import { Joiner } from "./pages/Joiner";
 import toast, { Toaster } from 'react-hot-toast';
 import { LinkJoin } from "./pages/LinkJoin";
-import { ErrorPage } from "./pages/ErrorPage";
+import { EndCall } from "./pages/EndCall";
 
-// export const url = "http://localhost:3001"
-export const url = "https://ancient-caverns-06365.herokuapp.com/" 
+export const url = "http://localhost:3001"
+// export const url = "https://ancient-caverns-06365.herokuapp.com/" 
 
 export const context = createContext()
 
@@ -59,7 +59,7 @@ function App() {
             <Route path="/join" element={<Join/>}/>
             <Route path="/join/:id" element={<Joiner toast={toast}/>}/>
             <Route path="/link/:roomID" element={<LinkJoin/>}/>
-            <Route path="/error" element={<ErrorPage/>}/>
+            <Route path="/endcall" element={<EndCall/>}/>
           </Routes>
         </BrowserRouter>
       </context.Provider>

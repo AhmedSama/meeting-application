@@ -112,7 +112,7 @@ export const Joiner = ({toast}) => {
       })
     }
     socket.disconnect()
-    window.location.href = "/"
+    window.location.href = "/endcall"
   }
 
   useEffect(()=>{

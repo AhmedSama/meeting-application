@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
 :root{
-  --border : 1px solid #A1A1A1;
-  --bg-color : #00a2ff;
+  --border : 1px solid rgba(0,0,0,0.2);
+  --bg-color : #687ded;
   --color : #5E5E5E;
   --radius : 5px;
   --outline : 7px solid #ff00882b;
@@ -15,9 +15,14 @@
   font-family: 'Poppins', sans-serif;
 }
 
+.dark {
+  color: var(--color);
+}
+
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #F4F8FA;
 }
 a{
   text-decoration: none;
@@ -38,6 +43,15 @@ a{
   color: var(--color);
   font-weight: 400;
 }
+.flex{
+  display: flex;
+}
+.items-center{
+  align-items: center;
+}
+.m-10{
+  margin: 10px;
+}
 .border-bottom{
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
@@ -47,6 +61,7 @@ a{
 .small{
   font-size: 15px;
   font-weight: 300;
+  color: var(--color);
 }
 
 .link{
@@ -55,8 +70,10 @@ a{
 
 .form{
   padding: 2.5rem 3rem;
-  border:var(--border);
-  border-radius: var(--radius);
+  background-color: white;
+  border-radius:8px ;
+  box-shadow: 0 16px 32px rgba(30,42,50,0.08);
+  background-color: white;
   display: flex;
   flex-direction: column;
   gap: 30px;
@@ -238,6 +255,9 @@ input::placeholder{
 }
 .action-icon-container.danger{
   background-color: #fd0c44;
+}
+.color-danger{
+  color: #fd0c44;
 }
 
 .action-icon-container:hover{
@@ -461,6 +481,55 @@ input::placeholder{
 .drop-down-item:hover{
   background-color: rgba(0, 0, 0, 0.1);
 }
+
+/* endcall */
+.end-call{
+  display: flex;
+  width: 100%;
+  height: 100vh;
+}
+.image{
+  flex: 1;
+  overflow: hidden;
+}
+.image{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.img-container{
+  width: 450px;
+  height: 450px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 50%;
+  box-shadow:  0 16px 32px rgba(30,42,50,0.08);
+
+}
+.img-container img{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.contact{
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
+  flex-direction: column;
+}
+.btns{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 @media ( max-width: 1300px){
   .left{
     width: 25%;
@@ -489,6 +558,7 @@ input::placeholder{
 
 
 @media ( max-width: 900px ){
+
   .left{
     width: 0%;
   }
@@ -513,18 +583,26 @@ input::placeholder{
   }
   .form{
     padding: 1rem 1rem;
-    border:none;
-    width: 70%;
-    background-color: #f3f6f8;
+    width: 80%;
   }
   .close-sidebar{
     display: block;
+  }
+  .end-call{
+    flex-direction: column;
+  }
+  .contact{
+    justify-content: flex-start;
+  }
+  .img-container{
+    width: 300px;
+    height: 300px;
   }
 
 }
 @media (max-width : 600px){
   .form{
-    width: 90%;
+    width: 100%;
   }
   #share-icon{
     display: none;
