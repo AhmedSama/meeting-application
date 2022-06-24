@@ -1,7 +1,7 @@
 import React from 'react'
 import { MdCallEnd } from 'react-icons/md'
 import { Link } from 'react-router-dom'
-import endcall from '../images/endcall.svg'
+import endcall from '../images/meet.svg'
 export const EndCall = () => {
   return (
     <div className='end-call'>
