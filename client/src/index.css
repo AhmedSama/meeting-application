@@ -256,9 +256,6 @@ input::placeholder{
 .action-icon-container.danger{
   background-color: #fd0c44;
 }
-.color-danger{
-  color: #fd0c44;
-}
 
 .action-icon-container:hover{
   opacity: 0.8;
@@ -507,8 +504,8 @@ input::placeholder{
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border-radius: 50%;
-  box-shadow:  0 16px 32px rgba(30,42,50,0.08);
+  /* border-radius: 50%;
+  box-shadow:  0 16px 32px rgba(30,42,50,0.08); */
 
 }
 .img-container img{
