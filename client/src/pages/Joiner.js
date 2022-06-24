@@ -22,7 +22,9 @@ export const Joiner = ({toast}) => {
   const peerRef = useRef(new Peer())
   const peerConnectionsRef = useRef([])
   const peerIDRef = useRef(null)
-  const streamRef = useRef(null)
+  const audioTrack = silence()
+  const streamRef = useRef( new MediaStream() )
+  streamRef.current.addTrack(audioTrack)
   const [audioIcon,setAudioIcon] = useState(false)
   const [audioStreamAllowed,setAudioStreamAllowed] = useState(false)
   const videoRef = useRef()
@@ -80,17 +82,11 @@ export const Joiner = ({toast}) => {
     }
   } 
   const call = async(peerID) => {
-    // try{
-    //   // if the audio is already allowed it is not gonna ask the user again
-    //   streamRef.current = await navigator.mediaDevices.getUserMedia({audio:true})
-    // }
-    // catch(error){
-    //     streamRef.current = new MediaStream([silence()]) 
-    //     setAudioIcon(false)
-    // }
+
     const c = peerRef.current.call(peerID,streamRef.current)
-    peerConnectionsRef.current.push(c.peerConnection)
     c.on('stream', function(remoteStream) {
+      peerConnectionsRef.current.push(c.peerConnection)
+      console.log(c.peerConnection)
       const video = document.createElement("video")
       video.srcObject = remoteStream
       video.play()
@@ -120,19 +116,15 @@ export const Joiner = ({toast}) => {
   }
 
   useEffect(()=>{
-    peerRef.current.on('call', async function(call) {
-      peerConnectionsRef.current.push(call.peerConnection)
-      try{
-        streamRef.current = await navigator.mediaDevices.getUserMedia({audio:true})
-        setAudioIcon(true)
-        setAudioStreamAllowed(true)
-      }catch(error){
-        const audioTrack = silence()
-        streamRef.current = new MediaStream() 
-        streamRef.current.addTrack(audioTrack)
-      }
+    peerRef.current.on('call', async (call) => {
+      
       call.answer(streamRef.current)
-      call.on('stream', function(remoteStream) {
+
+      // adding the peerConnection after answering the call 
+      // cuz it is undefiend before answer
+      peerConnectionsRef.current.push(call.peerConnection)
+      call.on('stream', (remoteStream) => {
+
           const videoTracks = getVideoTracks(remoteStream)
           if(videoTracks.length > 0){
             setHostScreenIsSharing(videoTracks[0].enabled)
@@ -196,17 +188,21 @@ export const Joiner = ({toast}) => {
   },[])
 
   const replaceTrack = (kind,track) => {
+    console.log(peerConnectionsRef.current)
     for(let peerConnection of peerConnectionsRef.current){
-      const sender = peerConnection.getSenders().find(s=>s.track.kind === kind)
+      const sender = peerConnection?.getSenders().find(s=>s.track.kind === kind)
+
       if(sender){
         sender.replaceTrack(track)
+        console.log(sender)
       }
     }
   }
   const toggleAudio  = async() => {
     if(audioStreamAllowed){
-      streamRef.current.getAudioTracks()[0].enabled = streamRef.current.getAudioTracks()[0].enabled ? false : true
-      setAudioIcon(streamRef.current.getAudioTracks()[0].enabled)
+      console.log("video off")
+      streamRef.current.getAudioTracks()[0].enabled = !audioIcon
+      setAudioIcon(!audioIcon)
     }
     else{
       const newAudioStream = await getAudioStream()
