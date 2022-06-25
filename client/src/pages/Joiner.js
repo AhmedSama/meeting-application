@@ -10,7 +10,7 @@ import msgAudioSrc from "../sounds/msg.mp3"
 import { CgClose } from "react-icons/cg"
 import { IoHandRightSharp } from 'react-icons/io5'
 import { MdCallEnd } from 'react-icons/md'
-import { getAudioStream, silence } from '../utility'
+import { getAudioStream, getAudioTracks, getVideoTracks, silence } from '../utility'
 
 
 export const Joiner = ({toast}) => {
@@ -53,15 +53,7 @@ export const Joiner = ({toast}) => {
   //   streamRef.current = new MediaStream() 
   //   streamRef.current.addTrack(audioTrack)
   // },[])
-  const getVideoTracks = (stream) => {
-    // return stream.getTracks().find(track=>track.kind === "video")
-    try{
-      return stream.getVideoTracks()
-    }
-    catch(err){
-      return null
-    }
-  }
+  
   useEffect(()=>{
     if(playMsgSound){
       msgSound.currentTime = 0
@@ -100,7 +92,7 @@ export const Joiner = ({toast}) => {
         track.stop();
       })
       socket.disconnect()
-      window.location.href = "/"
+      window.location.href = "/endcall"
     })
   },[])
   const closeCall = () => {
@@ -126,9 +118,15 @@ export const Joiner = ({toast}) => {
       call.on('stream', (remoteStream) => {
 
           const videoTracks = getVideoTracks(remoteStream)
+          const audioTracks = getAudioTracks(remoteStream)
           if(videoTracks.length > 0){
             setHostScreenIsSharing(videoTracks[0].enabled)
-            videoRef.current.srcObject = remoteStream
+            const vidStream = new MediaStream([...videoTracks])
+            const audStream = new MediaStream([...audioTracks])
+            videoRef.current.srcObject = vidStream
+            const video = document.createElement("video")
+            video.srcObject = audStream
+            video.play()
           }
           else{
             console.log("audio answer")

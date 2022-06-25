@@ -35,7 +35,24 @@ export const getVideoStream = async() => {
     return null
   }
 }
-
+export const getVideoTracks = (stream) => {
+  // return stream.getTracks().find(track=>track.kind === "video")
+  try{
+    return stream.getVideoTracks()
+  }
+  catch(err){
+    return null
+  }
+}
+export const getAudioTracks = (stream) => {
+  // return stream.getTracks().find(track=>track.kind === "video")
+  try{
+    return stream.getAudioTracks()
+  }
+  catch(err){
+    return null
+  }
+}
 
 
 
