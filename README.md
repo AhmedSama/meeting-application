@@ -50,7 +50,7 @@ run the server
 ```bash
   npm start
 ```
-cd back and then to client directory and run npm install
+open new terminal session and navigate to client directory and run npm install
 ```bash
   cd ..
   cd client
