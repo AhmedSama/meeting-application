@@ -52,7 +52,6 @@ run the server
 ```
 open new terminal session and navigate to client directory and run npm install
 ```bash
-  cd ..
   cd client
   npm install
 ```
